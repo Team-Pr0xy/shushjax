@@ -1,6 +1,9 @@
 # shushjax #
 
 Standalone (no jQuery) Headerless Pushstate + AJAX. 
+shushjax uses ajax and pushState to deliver a fast browsing experience with real permalinks, page titles, and a working back button. shushjax works by grabbing html from your server via ajax and replacing the content of a container on your page with the ajax'd html. It then updates the browser's current url using pushState without reloading your page's layout or any resources (js, css), giving the appearance of a fast, full page load. But really it's just ajax and pushState.
+
+For [browsers that don't support pushState][compat] shushjax fully degrades.
 Inspired by the original PJAX, forked from PJAX-Standalone and with pjax-fw ported over. 
 The design is loosely based on the original jquery implementation found at: https://github.com/defunkt/jquery-pjax  
 This code is licensed under the MIT Licence
@@ -19,12 +22,12 @@ Compared to the original PJAX, shushjax offers additional flexibility, performan
 * No jQuery required means that the browser does not need to load and process tens of kilobytes of unused javascript, increasing performance
 
 ## Compatability ##
-This code should work in in Chrome, Firefox, Opera and IE7,8, 9, and 10+. 
-shushjax is supported in Chrome, Firefox and Opera, while in old IE the fallbacks operate.
+This code should work in in Chrome, Firefox, Opera, Safari and IE 10+. 
+shushjax is supported in Chrome, Firefox, Safari and Opera, while in old IE (9 and lower) the fallbacks operate.
 
 ### Usage Instructions
 
-To add shushjax to your page, you will need to include the pjax-standalone.js script in to the head of your document.
+To add shushjax to your page, you will need to include the shushjax.js script in to the head of your document.
 
 Once done, shushjax can be setup in 3 ways. 
 
@@ -98,16 +101,8 @@ or
 
 ### Server side.
 
-The original PJAX headers are being replaced with the partial page method from pjaw-fw
+The original PJAX header-based way of doing things has been replaced with the partial file method from pjax-fw. In the root directory of your website, add a folder called "partials". Update your code to create copies of your pages under this directory with only the main content area intact. For example, if the original page was example.com/oceans/pacific.html, then the partial page should be located at example.com/partials/oceans/pacific.html. 
 
-Update your code to return only the main content area when the X-PJAX header is set, while returning the full website layout when it is not.
-	
-	<?php
-	$headers = getallheaders();
-	if(($headers['X-PJAX'] == 'true')){
-		//Output content on its own.
-	}else{
-		//Output content with wrapper/layout
-	}
+Unfortunately, shushjax cannot currently function on websites where you cannot place content directly under the root domain. This will be fixed in the future. 
 
-If you are unable to change the backend code, or simply do not want to. So long as smartLoad is enabled (which it is by default), PJAX-Standalone will extract the container_divs content from the returned HTML and apply it to the current page meaning PJAX loading will still work as expect (although some of PJAX's performance gains may be lost).
+If you are unable to create partial pages, or simply do not want to, a solution is coming. So long as smartLoad is enabled, shushjax can extract the container_divs content from the returned HTML and apply it to the current page meaning shushjax loading will still work as expect (although some of shushjax's performance gains may be lost). This functionality is not yet implemented. 
