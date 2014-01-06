@@ -1,19 +1,17 @@
 /**
- * PJAX- Standalone
+ * shushjax
  *
  * A standalone implementation of Pushstate AJAX, for non-JQuery webpages.
- * JQuery users should use the original implimention at: https://github.com/defunkt/jquery-pjax
- * 
- * @version 0.5
- * @author Carl
- * @source https://github.com/thybag/PJAX-Standalone
+ * @version 0.0
+ * @author JC Hulce
+ * @source https://github.com/jchulce/shushjax
  * @license MIT
  */
 (function(){
 
 	//Object to store private values/methods.
 	var internal = {
-		//Is this the first usage of pjax? (Ensure history entery has required values if so.)
+		//Is this the first usage of shushjax? (Ensure history entery has required values if so.)
 		"firstrun": true,
 		//Borrowed wholesale from https://github.com/defunkt/jquery-pjax
 		//Attempt to check that a device supports pushstate before attempting to use it.
