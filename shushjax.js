@@ -82,7 +82,7 @@
 	 */
 	internal.addEvent(window, 'popstate', function(st){
 		if(st.state != null){
-			//Convert state data to pjax options
+			//Convert state data to shushjax options
 			var options = internal.parseOptions({	
 				'url': st.state.url, 
 				'container': st.state.container, 
@@ -97,7 +97,7 @@
 
 	/**
 	 * attach
-	 * Attach pjax listeners to a link.
+	 * Attach shushjax listeners to a link.
 	 * @scope private
 	 * @param link_node. link that will be clicked.
 	 * @param content_node. 
@@ -165,9 +165,9 @@
 	}
 	/**
 	 * SmartLoad
-	 * Smartload checks the returned HTML to ensure PJAX ready content has been provided rather than
+	 * Smartload checks the returned HTML to ensure shushjax ready content has been provided rather than
      * a full HTML page. If a full HTML has been returned, it will attempt to scan the page and extract
-     * the correct html to update our container with in order to ensure PJAX still functions as expected.
+     * the correct html to update our container with in order to ensure shushjax still functions as expected.
 	 *
 	 * @scope private
 	 * @param html (HTML returned from AJAX)
@@ -188,9 +188,9 @@
 		for(var i=0;i<tmpNodes.length;i++){
 			if(tmpNodes[i].id == options.container.id){
 				// If our container div is within the returned HTML, we both know the returned content is
-				//not PJAX ready, but instead likely the full HTML content. in Addition we can also guess that
+				//not shushjax ready, but instead likely the full HTML content. in Addition we can also guess that
 				//the content of this node is what we want to update our container with.
-				//Thus use this content as the HTML to append in to our page via PJAX.
+				//Thus use this content as the HTML to append in to our page via shushjax.
 				return tmpNodes[i].innerHTML; 
 				break;
 			}
@@ -201,7 +201,7 @@
 
 	/**
 	 * handle
-	 * Handle requests to load content via pjax.
+	 * Handle requests to load content via shushjax.
 	 * @scope private
 	 * @param url. Page to load.
 	 * @param node. Dom node to add returned content in to.
@@ -238,7 +238,7 @@
 			
 			//Do we need to add this to the history?
 			if(options.history){
-				//If this is the first time pjax has run, create a state object for the current page.
+				//If this is the first time shushjax has run, create a state object for the current page.
 				if(internal.firstrun){
 					window.history.replaceState({'url': document.location.href, 'container':  options.container.id}, document.title);
 					internal.firstrun = false;
@@ -256,7 +256,7 @@
 				internal.triggerEvent(options.container,'success');
 			}
 
-			//If Google analytics is detected push a trackPageView, so PJAX pages can 
+			//If Google analytics is detected push a trackPageView, so shushjax pages can 
 			//be tracked successfully.
 			if(window._gaq) _gaq.push(['_trackPageview']);
 
@@ -287,11 +287,9 @@
 					callback(false);
 				}
 			}
-			//Secret pjax ?get param so browser doesnt return pjax content from cache when we dont want it to
-			//Switch between ? and & so as not to break any URL params (Based on change by zmasek https://github.com/zmasek/)
-			xmlhttp.open("GET", location + ((!/[?&]/.test(location)) ? '?_pjax' : '&_pjax'), true);
+			xmlhttp.open("GET", location.protocol + "//" + location.host + "/partials" + location.pathname, true);
 			//Add headers so things can tell the request is being performed via AJAX.
-			xmlhttp.setRequestHeader('X-PJAX', 'true'); //PJAX header
+			xmlhttp.setRequestHeader('X-shushjax', 'true'); //shushjax header, kept so you can see usage in server logs
 			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');//Standard AJAX header.
 
 			xmlhttp.send(null);
@@ -328,13 +326,13 @@
 		}
 
 		//Parse Links on load? Enabled by default.
-		//(Proccess pages loaded via PJAX and setup PJAX on any links found.)
+		//(Proccess pages loaded via shushjax and setup shushjax on any links found.)
 		if(typeof options.parseLinksOnload == 'undefined'){
 			options.parseLinksOnload = opt.parseLinksOnload;
 		}
 
 		//Smart load (enabled by default.) Trys to ensure the correct HTML is loaded.
-		//If you are certain your backend will only return PJAX ready content this can be disabled
+		//If you are certain your backend will only return shushjax ready content this can be disabled
 		//for a slight perfomance boost.
 		if(typeof options.smartLoad == 'undefined'){
 			options.smartLoad = opt.smartLoad;
@@ -369,7 +367,7 @@
 
 	/**
 	 * connect
-	 * Attach links to PJAX handlers.
+	 * Attach links to shushjax handlers.
 	 * @scope public
 	 *
 	 * Can be called in 3 ways.
@@ -450,6 +448,6 @@
 		if(options !== false) internal.handle(options);
 	}
 
-	//Make PJAX object accessible
+	//Make shushjax object accessible
 	window.pjax = this;
 }).call({});
