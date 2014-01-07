@@ -287,7 +287,10 @@
 					callback(false);
 				}
 			}
-			xmlhttp.open("GET", location.protocol + "//" + location.host + "/partials" + location.pathname, true);
+			//Actually sent the request
+			//Use partial file support if it's enabled
+			if(options.partial){
+			xmlhttp.open("GET", location.protocol + "//" + location.host + "/partials" + location.pathname, true);}else{xmlhttp.open("GET", location, true}
 			//Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); //shushjax header, kept so you can see usage in server logs
 			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');//Standard AJAX header.
@@ -309,6 +312,7 @@
 		opt.history = true;
 		opt.parseLinksOnload = true;
 		opt.smartLoad = true;
+		opt.partial = false;
 
 		//Ensure a url and container have been provided.
 		if(typeof options.url == 'undefined' || typeof options.container == 'undefined'){
@@ -329,6 +333,11 @@
 		//(Proccess pages loaded via shushjax and setup shushjax on any links found.)
 		if(typeof options.parseLinksOnload == 'undefined'){
 			options.parseLinksOnload = opt.parseLinksOnload;
+		}
+
+		//Use partial file support? Disabled by default
+		if(typeof options.partial == 'undefined'){
+			options.partial = opt.partial;
 		}
 
 		//Smart load (enabled by default.) Trys to ensure the correct HTML is loaded.
