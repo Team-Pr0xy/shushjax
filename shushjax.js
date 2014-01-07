@@ -290,7 +290,7 @@
 			//Actually sent the request
 			//Use partial file support if it's enabled
 			if(options.partial){
-			xmlhttp.open("GET", location.protocol + "//" + location.host + "/partials" + location.pathname, true);}else{xmlhttp.open("GET", location, true}
+			xmlhttp.open("GET", location.protocol + "//" + location.host + "/partials" + location.pathname, true);}else{xmlhttp.open("GET", location, true);}
 			//Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); //shushjax header, kept so you can see usage in server logs
 			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');//Standard AJAX header.
