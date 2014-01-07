@@ -114,9 +114,9 @@
 		}
 		//Add link href to object
 		options.url = node.href;
-		//If pjax data is specified, use as container
-		if(node.getAttribute('data-pjax')){
-			options.container = node.getAttribute('data-pjax');
+		//If shushjax data is specified, use as container
+		if(node.getAttribute('data-shushjax')){
+			options.container = node.getAttribute('data-shushjax');
 		}
 		//If data-title is specified, use as title.
 		if(node.getAttribute('data-title')){
@@ -372,7 +372,7 @@
 	 *
 	 * Can be called in 3 ways.
 	 * Calling as connect(); 
-	 * 		Will look for links with the data-pjax attribute.
+	 * 		Will look for links with the data-shushjax attribute.
 	 *
 	 * Calling as connect(container_id)
 	 *		Will try to attach to all links, using the container_id as the target.
@@ -422,7 +422,7 @@
 	
 	/**
 	 * invoke
-	 * Directly invoke a pjax page load.
+	 * Directly invoke a shushjax page load.
 	 * invoke({url: 'file.php', 'container':'content'});
 	 *
 	 * @scope public
@@ -437,17 +437,17 @@
 		}else{
 			options = arguments[0];
 		}
-		//If PJAX isn't supported by the current browser, push user to specified page.
+		//If shushjax isn't supported by the current browser, push user to specified page.
 		if(!internal.is_supported){
 			document.location = options.url;
 			return;	
 		} 
 		//Proccess options
 		options = internal.parseOptions(options);
-		//If everything went ok, activate pjax.
+		//If everything went ok, activate shushjax.
 		if(options !== false) internal.handle(options);
 	}
 
 	//Make shushjax object accessible
-	window.pjax = this;
+	window.shushjax = this;
 }).call({});
