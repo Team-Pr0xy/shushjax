@@ -114,6 +114,10 @@
 		}
 		//Add link href to object
 		options.url = node.href;
+		//Ignore anchor links (links to another part of the same page, beginning with #)
+		//( node.hash !== 'undefined' ) &&
+		//if( node.pathname.split("#").shift() == options.url.pathname ) {
+		//if( options.url.split('#').shift() == window.location.pathname.split('#').shift() ) return;
 		//If shushjax data is specified, use as container
 		if(node.getAttribute('data-shushjax')){
 			options.container = node.getAttribute('data-shushjax');
@@ -211,9 +215,12 @@
 		
 		//Fire beforeSend Event.
 		internal.triggerEvent(options.container, 'beforeSend');
+		
+		//Are we loading partial pages?
+		if(options.partial){ options.geturl = url.location.protocol + "//" + url.location.host + "/partials" + url.location.pathname;}else{ options.geturl = options.url; }
 
 		//Do the request
-		internal.request(options.url, function(html){
+		internal.request(options.geturl, function(html){
 
 			//Ensure we have the correct HTML to apply to our container.
 			if(options.smartLoad) html = internal.smartLoad(html, options);
@@ -287,10 +294,9 @@
 					callback(false);
 				}
 			}
-			//Actually sent the request
+			//Actually send the request
 			//Use partial file support if it's enabled
-			if(options.partial){
-			xmlhttp.open("GET", location.protocol + "//" + location.host + "/partials" + location.pathname, true);}else{xmlhttp.open("GET", location, true);}
+			xmlhttp.open("GET", location, true);
 			//Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); //shushjax header, kept so you can see usage in server logs
 			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');//Standard AJAX header.
