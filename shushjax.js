@@ -112,13 +112,13 @@
 			 node.host !== document.location.host ){
 			return;
 		}
+		// Ignore anchors on the same page
+		// From https://github.com/defunkt/jquery-pjax/pull/83/files
+                if ( document.location.hash && document.location.replace(document.location.hash, '') ===
+                document.location.replace(document.location.hash, '') )
+                return true;
 		//Add link href to object
 		options.url = node.href;
-		//Ignore anchor links (links to another part of the same page, beginning with #)
-		//( node.hash !== 'undefined' ) &&
-		//if( node.pathname.split("#").shift() == options.url.pathname ) {
-		//if( options.url.split('#').shift() == window.location.pathname.split('#').shift() ) return;
-		//If shushjax data is specified, use as container
 		if(node.getAttribute('data-shushjax')){
 			options.container = node.getAttribute('data-shushjax');
 		}
