@@ -217,10 +217,10 @@
 		internal.triggerEvent(options.container, 'beforeSend');
 		
 		//Are we loading partial pages?
-		if(options.partial){ options.geturl = url.location.protocol + "//" + url.location.host + "/partials" + url.location.pathname;}else{ options.geturl = options.url; }
+		//if(options.partial){ options.geturl = url.location.protocol + "//" + url.location.host + "/partials" + url.location.pathname;}else{ options.geturl = options.url; }
 
 		//Do the request
-		internal.request(options.geturl, function(html){
+		internal.request(options.url, options.partial, function(html){
 
 			//Ensure we have the correct HTML to apply to our container.
 			if(options.smartLoad) html = internal.smartLoad(html, options);
@@ -281,7 +281,7 @@
 	 * @param location. Page to request.
 	 * @param callback. Method to call when a page is loaded.
 	 */
-	internal.request = function(location, callback){
+	internal.request = function(location, partial, callback){
 		//Create xmlHttpRequest object.
 		try {xmlhttp = window.XMLHttpRequest?new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");}  catch (e) { }
 			//Add state listener.
@@ -296,7 +296,9 @@
 			}
 			//Actually send the request
 			//Use partial file support if it's enabled
-			xmlhttp.open("GET", location, true);
+			formaturl = new URL(location)
+			if(partial){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
+			xmlhttp.open("GET", getlocation, true);
 			//Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); //shushjax header, kept so you can see usage in server logs
 			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');//Standard AJAX header.
