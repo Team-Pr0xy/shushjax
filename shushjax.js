@@ -294,10 +294,13 @@
 					callback(false);
 				}
 			}
-			//Actually send the request
-			//Use partial file support if it's enabled
+			//re-format the URL so we can modify it
 			formaturl = new URL(location)
-			if(partial){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
+			//if the client doesn't support URL(), disable partial file support
+			if(formaturl){}else{ partial == false; }
+			//Use partial file support if it's enabled
+			if(partial == true){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
+			//Actually send the request
 			xmlhttp.open("GET", getlocation, true);
 			//Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); //shushjax header, kept so you can see usage in server logs
