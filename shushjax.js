@@ -4,7 +4,7 @@
  * A standalone implementation of Pushstate AJAX, for non-JQuery webpages.
  * @version 0.0
  * @author JC Hulce
- * @source https://github.com/jchulce/shushjax
+ * @source https://github.com/Team-Pr0xy/shushjax
  * @license MIT
  */
 (function(){
