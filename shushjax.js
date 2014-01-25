@@ -314,7 +314,7 @@
 			// re-format the URL so we can modify it
 			formaturl = new URL(location);
 			// if the client doesn't support URL(), disable partial file support
-			if(! formaturl) partial === false;
+			if(! formaturl) partial = false;
 			// Use partial file support if it's enabled
 			if(partial === true){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
 			// Actually send the request
