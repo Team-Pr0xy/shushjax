@@ -129,8 +129,8 @@
                 // document.location.replace(document.location.hash, '') )
                 // return true;
                 if(node.pathname == location.pathname && node.hash.length > 0) {
-                         return true
-                 };
+                         return true;
+                 }
                 
 		// Add link href to object
 		options.url = node.href;
@@ -314,7 +314,7 @@
 			// re-format the URL so we can modify it
 			formaturl = new URL(location);
 			// if the client doesn't support URL(), disable partial file support
-			if(formaturl){;}else{ partial === false; }
+			if(! formaturl){ partial === false; }
 			// Use partial file support if it's enabled
 			if(partial === true){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
 			// Actually send the request
@@ -409,20 +409,20 @@
 	 *
 	 * Can be called in 3 ways.
 	 * Calling as connect(); 
-	 * 		Will look for links with the data-shushjax attribute.
+	 * Will look for links with the data-shushjax attribute.
 	 *
 	 * Calling as connect(container_id)
-	 *		Will try to attach to all links, using the container_id as the target.
+	 * Will try to attach to all links, using the container_id as the target.
 	 *
 	 * Calling as connect(container_id, class_name)
-	 * 		Will try to attach any links with the given classname, using container_id as the target.
+	 * Will try to attach any links with the given classname, using container_id as the target.
 	 *
 	 * Calling as connect({	
-	 *						'url':'somepage.php',
-	 *						'container':'somecontainer',
-	 * 						'beforeSend': function(){console.log("sending");}
-	 *					})
-	 * 		Will use the provided json to configure the script in full (including callbacks)
+	 * 'url':'somepage.php',
+	 * 'container':'somecontainer',
+	 * 'beforeSend': function(){console.log("sending");}
+	 * })
+	 * Will use the provided json to configure the script in full (including callbacks)
 	 */
 	this.connect = function(/* options */){
 		// connect();
