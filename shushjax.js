@@ -2,19 +2,19 @@
  * shushjax
  *
  * A standalone implementation of Pushstate AJAX, for non-JQuery webpages.
- * @version 0.0
+ * @version 0.1
  * @author JC Hulce
  * @source https://github.com/Team-Pr0xy/shushjax
  * @license MIT
  */
 (function(){
 
-	//Object to store private values/methods.
+	// Object to store private values/methods.
 	var internal = {
-		//Is this the first usage of shushjax? (Ensure history entery has required values if so.)
+		// Is this the first usage of shushjax? (Ensure history entery has required values if so.)
 		"firstrun": true,
-		//Borrowed wholesale from https://github.com/defunkt/jquery-pjax
-		//Attempt to check that a device supports pushstate before attempting to use it.
+		// Borrowed wholesale from https://github.com/defunkt/jquery-pjax
+		// Attempt to check that a device supports pushstate before attempting to use it.
 		"is_supported": window.history && window.history.pushState && window.history.replaceState && !navigator.userAgent.match(/((iPod|iPhone|iPad).+\bOS\s+[1-4]|WebApps\/.+CFNetwork)/)
 	};
 	
@@ -29,10 +29,10 @@
 	 */
 	internal.addEvent = function(obj, event, callback){
 		if(window.addEventListener){
-				//Browsers that don't suck
+				// Browsers that don't suck
 				obj.addEventListener(event, callback, false);
 		}else{
-				//IE8/7
+				// IE8/7
 				obj.attachEvent('on'+event, callback);
 		}
 	}
@@ -65,12 +65,12 @@
 	 */
 	internal.triggerEvent = function(node, event_name){
 		if (document.createEvent) {
-			//Good browsers
+			// Good browsers
 			evt = document.createEvent("HTMLEvents");
     		evt.initEvent(event_name, true, true);
     		node.dispatchEvent(evt);
 		}else{
-			//old IE versions
+			// old IE versions
 			evt = document.createEventObject();
     		evt.eventType = 'on'+ event_name;
     		node.fireEvent(evt.eventType, evt);
@@ -82,15 +82,25 @@
 	 */
 	internal.addEvent(window, 'popstate', function(st){
 		if(st.state != null){
-			//Convert state data to shushjax options
-			var options = internal.parseOptions({	
+
+			var opt = {	
 				'url': st.state.url, 
 				'container': st.state.container, 
 				'history': false
-			});
-			//If somthing went wrong, return.
+			}
+
+                        // Merge original in original connect options
+                        if(typeof internal.options !== 'undefined'){
+                                for(var a in internal.options){ 
+                                        if(typeof opt[a] === 'undefined') opt[a] = internal.options[a];
+                                }         
+                        }
+
+                        // Convert state data to shushjax options
+                        var options = internal.parseOptions(opt);
+			// If somthing went wrong, return.
 			if(options == false) return;
-			//If there is a state object, handle it as a page load.
+			// If there is a state object, handle it as a page load.
 			internal.handle(options);
 		}
 	});
@@ -104,41 +114,48 @@
 	 */
 	internal.attach = function(node, options){
 
-		//if no pushstate support, dont attach and let stuff work as normal.
+		// if no pushstate support, dont attach and let stuff work as normal.
 		if(!internal.is_supported) return;
 
-		//Ignore external links.
+		// Ignore external links.
 		if ( node.protocol !== document.location.protocol ||
 			 node.host !== document.location.host ){
 			return;
 		}
+		
 		// Ignore anchors on the same page
 		// From https://github.com/defunkt/jquery-pjax/pull/83/files
-                if ( document.location.hash && document.location.replace(document.location.hash, '') ===
-                document.location.replace(document.location.hash, '') )
-                return true;
-		//Add link href to object
+                // if ( document.location.hash && document.location.replace(document.location.hash, '') ===
+                // document.location.replace(document.location.hash, '') )
+                // return true;
+                if(node.pathname == location.pathname && node.hash.length > 0) {
+                         return true
+                 }
+                
+		// Add link href to object
 		options.url = node.href;
+		
+		// If data-shushjax is specified, use as container
 		if(node.getAttribute('data-shushjax')){
 			options.container = node.getAttribute('data-shushjax');
 		}
-		//If data-title is specified, use as title.
+		// If data-title is specified, use as title.
 		if(node.getAttribute('data-title')){
 			options.title = node.getAttribute('data-title');
 		}
-		//Check options are valid.
+		// Check options are valid.
 		options = internal.parseOptions(options);
 		if(options == false) return;
 
-		//Attach event.
+		// Attach event.
 		internal.addEvent(node, 'click', function(event){
-			//Allow middle click (pages in new windows)
+			// Allow middle click (pages in new windows)
 			if ( event.which > 1 || event.metaKey ) return;
-			//Dont fire normal event
+			// Dont fire normal event
 			if(event.preventDefault){event.preventDefault();}else{event.returnValue = false;}
-			//Take no action if we are already on said page?
+			// Take no action if we are already on said page?
 			if(document.location.href == options.url) return false;
-			//handle the load.
+			// handle the load.
 			internal.handle(options);
 		});
 	}
@@ -150,18 +167,17 @@
 	 * @param options. Valid Options object.
 	 */
 	internal.parseLinks = function(dom_obj, options){
-
 		if(typeof options.useClass != 'undefined'){
-			//Get all nodes with the provided classname.
+			// Get all nodes with the provided classname.
 			nodes = dom_obj.getElementsByClassName(options.useClass);
 		}else{
-			//If no class was provided, just get all the links
+			// If no class was provided, just get all the links
 			nodes = dom_obj.getElementsByTagName('a');
 		}
-		//For all returned nodes
+		// For all returned nodes
 		for(var i=0,tmp_opt; i < nodes.length; i++){
 			node = nodes[i];
-			//Override options history to true, else link parsing could be triggered by backbutton (which runs in no-history mode)
+			// Override options history to true, else link parsing could be triggered by backbutton (which runs in no-history mode)
 			tmp_opt = internal.clone(options);
 			tmp_opt.history = true;
 			internal.attach(node, tmp_opt);
@@ -179,27 +195,28 @@
 	 * @return HTML to append to our page.
 	 */
 	internal.smartLoad = function(html, options){
-		//Create tmp node (So we can interact with it via the DOM)
+		// Create tmp node (So we can interact with it via the DOM)
 		var tmp = document.createElement('div');
-		//Add html
+		// Add html
 		tmp.innerHTML = html; 
-			//grab the title if there is one
-			var title = tmp.querySelector('title');
-			if(title)
-			document.title = title.innerHTML;
+		
+			// Grab the title if there is one (maintain IE7 compatability)
+            var title = tmp.getElementsByTagName('title')[0].innerHTML;
+            if(title)
+           document.title = title;
 		//Look through all returned divs.
 		tmpNodes = tmp.getElementsByTagName('div');
 		for(var i=0;i<tmpNodes.length;i++){
 			if(tmpNodes[i].id == options.container.id){
 				// If our container div is within the returned HTML, we both know the returned content is
-				//not shushjax ready, but instead likely the full HTML content. in Addition we can also guess that
-				//the content of this node is what we want to update our container with.
-				//Thus use this content as the HTML to append in to our page via shushjax.
+				// not shushjax ready, but instead likely the full HTML content. in Addition we can also guess that
+				// the content of this node is what we want to update our container with.
+				// Thus use this content as the HTML to append in to our page via shushjax.
 				return tmpNodes[i].innerHTML; 
 				break;
 			}
 		}
-		//If our container was not found, HTML will be returned as is.
+		// If our container was not found, HTML will be returned as is.
 		return html;
 	}
 
@@ -213,29 +230,29 @@
 	 */
 	internal.handle = function(options){
 		
-		//Fire beforeSend Event.
+		// Fire beforeSend Event.
 		internal.triggerEvent(options.container, 'beforeSend');
 		
-		//Are we loading partial pages?
-		//if(options.partial){ options.geturl = url.location.protocol + "//" + url.location.host + "/partials" + url.location.pathname;}else{ options.geturl = options.url; }
+		// Are we loading partial pages?
+		// if(options.partial){ options.geturl = url.location.protocol + "//" + url.location.host + "/partials" + url.location.pathname;}else{ options.geturl = options.url; }
 
-		//Do the request
+		// Do the request
 		internal.request(options.url, options.partial, function(html){
 
-			//Ensure we have the correct HTML to apply to our container.
+			// Ensure we have the correct HTML to apply to our container.
 			if(options.smartLoad) html = internal.smartLoad(html, options);
 			
-			//Update the dom with the new content
+			// Update the dom with the new content
 			options.container.innerHTML = html;
 
-			//Initalise any links found within document (if enabled).
+			// Initalise any links found within document (if enabled).
 			if(options.parseLinksOnload){
 				internal.parseLinks(options.container, options);
 			}
 			
-			//If no title was provided
+			// If no title was provided
 			if(typeof options.title == 'undefined'){
-				//Attempt to grab title from page contents.
+				// Attempt to grab title from page contents.
 				if(options.container.getElementsByTagName('title').length != 0){
 					options.title = options.container.getElementsByTagName('title')[0].innerHTML;
 				}else{
@@ -243,31 +260,31 @@
 				}
 			}
 			
-			//Do we need to add this to the history?
+			// Do we need to add this to the history?
 			if(options.history){
-				//If this is the first time shushjax has run, create a state object for the current page.
+				// If this is the first time shushjax has run, create a state object for the current page.
 				if(internal.firstrun){
 					window.history.replaceState({'url': document.location.href, 'container':  options.container.id}, document.title);
 					internal.firstrun = false;
 				}
-				//Update browser history
+				// Update browser history
 				window.history.pushState({'url': options.url, 'container': options.container.id }, options.title , options.url);
 			}
 
-			//Fire Events
+			// Fire Events
 			internal.triggerEvent(options.container,'complete');
-			if(html == false){//Somthing went wrong
+			if(html == false){ //Somthing went wrong
 				internal.triggerEvent(options.container,'error');
 				return;
-			}else{//got what we expected.
+			}else{ //got what we expected.
 				internal.triggerEvent(options.container,'success');
 			}
 
-			//If Google analytics is detected push a trackPageView, so shushjax pages can 
-			//be tracked successfully.
+			// If Google analytics is detected push a trackPageView, so shushjax pages can 
+			// be tracked successfully.
 			if(window._gaq) _gaq.push(['_trackPageview']);
 
-			//Set new title
+			// Set new title
 			document.title = options.title;
 		});
 		
@@ -282,29 +299,29 @@
 	 * @param callback. Method to call when a page is loaded.
 	 */
 	internal.request = function(location, partial, callback){
-		//Create xmlHttpRequest object.
+		// Create xmlHttpRequest object.
 		try {xmlhttp = window.XMLHttpRequest?new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");}  catch (e) { }
-			//Add state listener.
+			// Add state listener.
 			xmlhttp.onreadystatechange = function(){
 				if ((xmlhttp.readyState == 4) && (xmlhttp.status == 200)) {
-					//Success, Return html
+					// Success, Return html
 					callback(xmlhttp.responseText);
 				}else if((xmlhttp.readyState == 4) && (xmlhttp.status == 404 || xmlhttp.status == 500)){
-					//error (return false)
+					// error (return false)
 					callback(false);
 				}
 			}
-			//re-format the URL so we can modify it
+			// re-format the URL so we can modify it
 			formaturl = new URL(location)
-			//if the client doesn't support URL(), disable partial file support
+			// if the client doesn't support URL(), disable partial file support
 			if(formaturl){}else{ partial == false; }
-			//Use partial file support if it's enabled
+			// Use partial file support if it's enabled
 			if(partial == true){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
-			//Actually send the request
+			// Actually send the request
 			xmlhttp.open("GET", getlocation, true);
-			//Add headers so things can tell the request is being performed via AJAX.
-			xmlhttp.setRequestHeader('X-shushjax', 'true'); //shushjax header, kept so you can see usage in server logs
-			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');//Standard AJAX header.
+			// Add headers so things can tell the request is being performed via AJAX.
+			xmlhttp.setRequestHeader('X-shushjax', 'true'); // shushjax header, kept so you can see usage in server logs
+			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Standard AJAX header.
 
 			xmlhttp.send(null);
 	}
@@ -318,47 +335,47 @@
 	 * @return false | valid options object
 	 */
 	internal.parseOptions = function(options){
-		//Defaults. (if somthing isn't provided)
+		// Defaults. (if somthing isn't provided)
 		opt = {};
 		opt.history = true;
 		opt.parseLinksOnload = true;
 		opt.smartLoad = true;
 		opt.partial = false;
 
-		//Ensure a url and container have been provided.
+		// Ensure a url and container have been provided.
 		if(typeof options.url == 'undefined' || typeof options.container == 'undefined'){
 			console.log("URL and Container must be provided.");
 			return false;
 		}
 
-		//Find out if history has been provided
+		// Find out if history has been provided
 		if(typeof options.history === 'undefined'){
-			//use default
+			// use default
 			options.history = opt.history;
 		}else{
-			//Ensure its bool.
+			// Ensure its bool.
 			options.history = (!(options.history == false));
 		}
 
-		//Parse Links on load? Enabled by default.
-		//(Proccess pages loaded via shushjax and setup shushjax on any links found.)
+		// Parse Links on load? Enabled by default.
+		// (Proccess pages loaded via shushjax and setup shushjax on any links found.)
 		if(typeof options.parseLinksOnload == 'undefined'){
 			options.parseLinksOnload = opt.parseLinksOnload;
 		}
 
-		//Use partial file support? Disabled by default
+		// Use partial file support? Disabled by default
 		if(typeof options.partial == 'undefined'){
 			options.partial = opt.partial;
 		}
 
-		//Smart load (enabled by default.) Trys to ensure the correct HTML is loaded.
-		//If you are certain your backend will only return shushjax ready content this can be disabled
-		//for a slight perfomance boost.
+		// Smart load (enabled by default.) Trys to ensure the correct HTML is loaded.
+		// If you are certain your backend will only return shushjax ready content this can be disabled
+		// for a slight perfomance boost.
 		if(typeof options.smartLoad == 'undefined'){
 			options.smartLoad = opt.smartLoad;
 		}
 
-		//Get container (if its an id, convert it to a dom node.)
+		// Get container (if its an id, convert it to a dom node.)
 		if(typeof options.container == 'string' ) {
 			container = document.getElementById(options.container);
 			if(container == null){
@@ -368,7 +385,7 @@
 			options.container = container;
 		}
 
-		//If everything went ok thus far, connect up listeners
+		// If everything went ok thus far, connect up listeners
 		if(typeof options.beforeSend == 'function'){
 			internal.addEvent(options.container, 'beforeSend', options.beforeSend);
 		}
@@ -381,7 +398,7 @@
 		if(typeof options.success == 'function'){
 			internal.addEvent(options.container, 'success', options.success);
 		}
-		//Return valid options
+		// Return valid options
 		return options;
 	}
 
@@ -408,33 +425,34 @@
 	 * 		Will use the provided json to configure the script in full (including callbacks)
 	 */
 	this.connect = function(/* options */){
-		//connect();
+		// connect();
 		var options = {};
-		//connect(container, class_to_apply_to)
+		// connect(container, class_to_apply_to)
 		if(arguments.length == 2){
 			options.container = arguments[0];
 			options.useClass = arguments[1];
 		}
-		//Either json or container id
+		// Either json or container id
 		if(arguments.length == 1){
 			if(typeof arguments[0] == 'string' ) {
-				//connect(container_id)
+				// connect(container_id)
 				options.container = arguments[0];
 			}else{
-				//Else connect({url:'', container: ''});
+				// Else connect({url:'', container: ''});
 				options = arguments[0];
 			}
 		}
-		//Delete history and title if provided. These options should only be provided via invoke();
+		// Delete history and title if provided. These options should only be provided via invoke();
 		delete options.title;
 		delete options.history;
 		
+		internal.options = options;
 		if(document.readyState == 'complete') {
 			internal.parseLinks(document, options);
 		} else {
-			//Dont run until the window is ready.
+			// Dont run until the window is ready.
 			internal.addEvent(window, 'load', function(){	
-				//Parse links using specified options
+				// Parse links using specified options
 				internal.parseLinks(document, options);
 			});
 		}
@@ -449,7 +467,7 @@
 	 * @param options  
 	 */
 	this.invoke = function(/* options */){
-		//url, container
+		// url, container
 		if(arguments.length == 2){
 			options = {};
 			options.url = arguments[0];
@@ -457,17 +475,27 @@
 		}else{
 			options = arguments[0];
 		}
-		//If shushjax isn't supported by the current browser, push user to specified page.
+		// If shushjax isn't supported by the current browser, push user to specified page.
 		if(!internal.is_supported){
 			document.location = options.url;
 			return;	
 		} 
-		//Proccess options
+		// Proccess options
 		options = internal.parseOptions(options);
-		//If everything went ok, activate shushjax.
+		// If everything went ok, activate shushjax.
 		if(options !== false) internal.handle(options);
 	}
 
-	//Make shushjax object accessible
-	window.shushjax = this;
+	var shushjax_obj = this;
+        if (typeof define === 'function' && define['amd']) {
+                // register shushjax as AMD module
+                define( function() {
+            return shushjax_obj;
+        });
+        }else{
+                // Make shushjax object accessible in global namespace
+                window.shushjax = shushjax_obj;
+        }
+
+
 }).call({});
