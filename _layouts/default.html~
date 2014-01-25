@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>{% if page.title %} {{ page.title }} | {% endif %}shushjax</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="pure-min.css">
+<link rel="stylesheet" href="style.css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<script src="/shushjax.js"></script>
+<script>shushjax.connect({'container': 'content',});</script>
+</head><body>
+<nav role="navigation"><div class="header">
+<div class="pure-menu pure-menu-open pure-menu-fixed pure-menu-horizontal">
+    <a href="index.html" class="pure-menu-heading">shushjax</a>
+
+    <ul>
+        <li><a href="index.html">Intro</a></li>
+        <li><a href="usage.html">Usage</a></li>
+        <li><a href="benefits.html">Benefits</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="history.html">History</a></li>
+        <li><a href="contribute.html">Contribute</a></li>
+        <li><a href="https://github.com/Team-Pr0xy/shushjax">GitHub</a></li>
+    </ul>
+</div></div></nav>
+{{ content }}
+<footer>
+<div class="footer">Copyright 2014 <a href="//www.teampr0xy.net">Team Proxy</a>. Some rights reserved. <a href="https://github.com/Team-Pr0xy/shushjax">GitHub Project</a>
+</footer>
+</body></html>

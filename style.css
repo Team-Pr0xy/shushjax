@@ -1,0 +1,151 @@
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0 auto;
+    line-height: 1.7em;
+}
+
+.l-box {
+    padding: 1em;
+}
+
+.header {
+    margin: 0 0;
+}
+
+    .header .pure-menu {
+        padding: 0.5em;
+    }
+
+        .header .pure-menu li a:hover,
+        .header .pure-menu li a:focus {
+            background: none;
+            border: none;
+            color: #aaa;
+        }
+
+body .primary-button {
+    background: #02a6eb;
+    color: #fff;
+}
+
+.splash {
+    margin: 2em auto 0;
+    padding: 3em 0.5em;
+    background: #eee;
+/*    float: left;
+    display: inline-block;
+    clear: right;*/
+}
+    .splash .splash-head {
+        font-size: 300%;
+        margin: 0em 0;
+        line-height: 1.2em;
+/*        float: left;
+        display: inline-block;
+        clear: right;*/
+    }
+    .splash .splash-subhead {
+        color: #777;
+        font-weight: 300;
+        line-height: 1.4em;
+    }
+    .splash .primary-button {
+        font-size: 150%;
+    }
+
+
+.content .content-subhead {
+    color: #999;
+    padding-bottom: 0.3em;
+    text-transform: uppercase;
+    margin: 0;
+    border-bottom: 2px solid #eee;
+    display: inline-block;
+}
+
+/*.content a:link, .content a:visited, .content a:hover, .content a:active {
+    color: #999;
+}*/
+
+.content .content-ribbon {
+    margin: 3em;
+    border-bottom: 1px solid #eee;
+}
+
+.ribbon {
+    background: #eee;
+    text-align: center;
+    padding: 2em;
+    color: #777;
+}
+    .ribbon h2 {
+        display: inline;
+        font-weight: normal;
+    }
+
+.footer {
+    background: #111;
+    color: #666;
+    text-align: center;
+    padding: 1em;
+    font-size: 80%;
+}
+.footer a:link, .footer a:visited, .footer a:hover, .footer a:active {
+    color: #666;
+}
+.fa-6x {
+  font-size: 6em;
+}
+.fa-7x {
+  font-size: 7em;
+}
+.fa-8x {
+  font-size: 8em;
+}
+.fa-9x {
+  font-size: 9em;
+}
+.fa-10x {
+  font-size: 10em;
+}
+.fa-11x {
+  font-size: 11em;
+}
+.fa-12x {
+  font-size: 12em;
+}
+.fa-13x {
+  font-size: 13em;
+}
+.fa-14x {
+  font-size: 14em;
+}
+.fa-15x {
+  font-size: 15em;
+}
+.icon {
+  text-align: center;
+}
+        .pure-button-xsmall {
+            font-size: 70%;
+        }
+
+        .pure-button-small {
+            font-size: 85%;
+        }
+
+        .pure-button-large {
+            font-size: 110%;
+        }
+
+        .pure-button-xlarge {
+            font-size: 125%;
+        }
+                .pure-button-error {
+            background: rgb(202, 60, 60); /* this is a maroon */
+        }
