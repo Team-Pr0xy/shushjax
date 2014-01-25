@@ -312,9 +312,18 @@
 				}
 			};
 			// re-format the URL so we can modify it
+			// Check for browser support of URL()
+			// if(! formaturl = new URL(location);) partial = false;
+			if (typeof(URL) === "function") {
 			formaturl = new URL(location);
-			// if the client doesn't support URL(), disable partial file support
-			if(! formaturl) partial = false;
+			// Some browsers implement URL() as webkitURL()
+			}else{
+			if (typeof(webkitURL) === "function"){
+			formaturl = new webkitURL(location);
+			// if the client doesn't support URL() or webkitURL(), disable partial file support
+			}else{
+			partial = false;
+			}}
 			// Use partial file support if it's enabled
 			if(partial === true){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
 			// Actually send the request
