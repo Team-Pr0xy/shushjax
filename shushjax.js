@@ -35,7 +35,7 @@
 				// IE8/7
 				obj.attachEvent('on'+event, callback);
 		}
-	}
+	};
 
 	/**
 	 * Clone
@@ -87,7 +87,7 @@
 				'url': st.state.url, 
 				'container': st.state.container, 
 				'history': false
-			}
+			};
 
                         // Merge original in original connect options
                         if(typeof internal.options !== 'undefined'){
@@ -119,7 +119,7 @@
 
 		// Ignore external links.
 		if ( node.protocol !== document.location.protocol ||
-			 node.host !== document.location.host ){
+			node.host !== document.location.host ){
 			return;
 		}
 		
@@ -130,7 +130,7 @@
                 // return true;
                 if(node.pathname == location.pathname && node.hash.length > 0) {
                          return true
-                 }
+                 };
                 
 		// Add link href to object
 		options.url = node.href;
@@ -145,7 +145,7 @@
 		}
 		// Check options are valid.
 		options = internal.parseOptions(options);
-		if(options == false) return;
+		if(options === false) return;
 
 		// Attach event.
 		internal.addEvent(node, 'click', function(event){
@@ -158,7 +158,7 @@
 			// handle the load.
 			internal.handle(options);
 		});
-	}
+	};
 	/**
 	 * parseLinks
 	 * Parse all links within a dom node, using settings provided in options.
@@ -182,7 +182,7 @@
 			tmp_opt.history = true;
 			internal.attach(node, tmp_opt);
 		}
-	}
+	};
 	/**
 	 * SmartLoad
 	 * Smartload checks the returned HTML to ensure shushjax ready content has been provided rather than
@@ -218,7 +218,7 @@
 		}
 		// If our container was not found, HTML will be returned as is.
 		return html;
-	}
+	};
 
 	/**
 	 * handle
@@ -253,7 +253,7 @@
 			// If no title was provided
 			if(typeof options.title == 'undefined'){
 				// Attempt to grab title from page contents.
-				if(options.container.getElementsByTagName('title').length != 0){
+				if(options.container.getElementsByTagName('title').length !== 0){
 					options.title = options.container.getElementsByTagName('title')[0].innerHTML;
 				}else{
 					options.title = document.title;
@@ -273,7 +273,7 @@
 
 			// Fire Events
 			internal.triggerEvent(options.container,'complete');
-			if(html == false){ //Somthing went wrong
+			if(html === false){ //Somthing went wrong
 				internal.triggerEvent(options.container,'error');
 				return;
 			}else{ //got what we expected.
@@ -288,7 +288,7 @@
 			document.title = options.title;
 		});
 		
-	}
+	};
 
 	/**
 	 * Request
@@ -310,13 +310,13 @@
 					// error (return false)
 					callback(false);
 				}
-			}
+			};
 			// re-format the URL so we can modify it
-			formaturl = new URL(location)
+			formaturl = new URL(location);
 			// if the client doesn't support URL(), disable partial file support
-			if(formaturl){}else{ partial == false; }
+			if(formaturl){;}else{ partial === false; }
 			// Use partial file support if it's enabled
-			if(partial == true){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
+			if(partial === true){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
 			// Actually send the request
 			xmlhttp.open("GET", getlocation, true);
 			// Add headers so things can tell the request is being performed via AJAX.
@@ -324,7 +324,7 @@
 			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Standard AJAX header.
 
 			xmlhttp.send(null);
-	}
+	};
 
 	/**
 	 * parseOptions
@@ -378,7 +378,7 @@
 		// Get container (if its an id, convert it to a dom node.)
 		if(typeof options.container == 'string' ) {
 			container = document.getElementById(options.container);
-			if(container == null){
+			if(container === null){
 				console.log("Could not find container with id:"+options.container);
 				return false;
 			}
@@ -400,7 +400,7 @@
 		}
 		// Return valid options
 		return options;
-	}
+	};
 
 	/**
 	 * connect
@@ -456,7 +456,7 @@
 				internal.parseLinks(document, options);
 			});
 		}
-	}
+	};
 	
 	/**
 	 * invoke
@@ -484,10 +484,10 @@
 		options = internal.parseOptions(options);
 		// If everything went ok, activate shushjax.
 		if(options !== false) internal.handle(options);
-	}
+	};
 
 	var shushjax_obj = this;
-        if (typeof define === 'function' && define['amd']) {
+        if (typeof define === 'function' && define.amd) {
                 // register shushjax as AMD module
                 define( function() {
             return shushjax_obj;
