@@ -53,7 +53,7 @@
 			object[i] = obj[i];
 		}
 		return object;
-	}
+	};
 
 	/**
 	 * triggerEvent
@@ -67,21 +67,21 @@
 		if (document.createEvent) {
 			// Good browsers
 			evt = document.createEvent("HTMLEvents");
-    		evt.initEvent(event_name, true, true);
-    		node.dispatchEvent(evt);
+		evt.initEvent(event_name, true, true);
+		node.dispatchEvent(evt);
 		}else{
 			// old IE versions
 			evt = document.createEventObject();
-    		evt.eventType = 'on'+ event_name;
-    		node.fireEvent(evt.eventType, evt);
+		evt.eventType = 'on'+ event_name;
+		node.fireEvent(evt.eventType, evt);
 		}
-	}
+	};
 	/**
 	 * popstate listener
 	 * Listens for back/forward button events and updates page accordingly.
 	 */
 	internal.addEvent(window, 'popstate', function(st){
-		if(st.state != null){
+		if(st.state !== null){
 
 			var opt = {	
 				'url': st.state.url, 
@@ -99,7 +99,7 @@
                         // Convert state data to shushjax options
                         var options = internal.parseOptions(opt);
 			// If somthing went wrong, return.
-			if(options == false) return;
+			if(options === false) return;
 			// If there is a state object, handle it as a page load.
 			internal.handle(options);
 		}
@@ -354,7 +354,7 @@
 			options.history = opt.history;
 		}else{
 			// Ensure its bool.
-			options.history = (!(options.history == false));
+			options.history = (!(options.history === false));
 		}
 
 		// Parse Links on load? Enabled by default.
