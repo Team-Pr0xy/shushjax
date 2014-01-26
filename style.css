@@ -101,6 +101,9 @@ body .primary-button {
 .footer a:link, .footer a:visited, .footer a:hover, .footer a:active {
     color: #666;
 }
+.pure-button a:link, .pure-button a:visited, .pure-button a:hover, .pure-button a:active {
+    color: #fff;
+}
 .fa-6x {
   font-size: 6em;
 }
