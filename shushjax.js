@@ -90,9 +90,9 @@
 			};
 
                         // Merge original in original connect options
-                        if(typeof internal.options !== 'undefined'){
+                        if(typeof internal.options !== "undefined"){
                                 for(var a in internal.options){ 
-                                        if(typeof opt[a] === 'undefined') opt[a] = internal.options[a];
+                                        if(typeof opt[a] === "undefined") opt[a] = internal.options[a];
                                 }         
                         }
 
@@ -128,7 +128,7 @@
                 // if ( document.location.hash && document.location.replace(document.location.hash, '') ===
                 // document.location.replace(document.location.hash, '') )
                 // return true;
-                if(node.pathname == location.pathname && node.hash.length > 0) {
+                if(node.pathname === location.pathname && node.hash.length > 0) {
                          return true;
                  }
                 
@@ -154,7 +154,7 @@
 			// Dont fire normal event
 			if(event.preventDefault){event.preventDefault();}else{event.returnValue = false;}
 			// Take no action if we are already on said page?
-			if(document.location.href == options.url) return false;
+			if(document.location.href === options.url) return false;
 			// handle the load.
 			internal.handle(options);
 		});
@@ -167,7 +167,7 @@
 	 * @param options. Valid Options object.
 	 */
 	internal.parseLinks = function(dom_obj, options){
-		if(typeof options.useClass != 'undefined'){
+		if(typeof options.useClass !== "undefined"){
 			// Get all nodes with the provided classname.
 			nodes = dom_obj.getElementsByClassName(options.useClass);
 		}else{
@@ -207,7 +207,7 @@
 		//Look through all returned divs.
 		tmpNodes = tmp.getElementsByTagName('div');
 		for(var i=0;i<tmpNodes.length;i++){
-			if(tmpNodes[i].id == options.container.id){
+			if(tmpNodes[i].id === options.container.id){
 				// If our container div is within the returned HTML, we both know the returned content is
 				// not shushjax ready, but instead likely the full HTML content. in Addition we can also guess that
 				// the content of this node is what we want to update our container with.
@@ -251,7 +251,7 @@
 			}
 			
 			// If no title was provided
-			if(typeof options.title == 'undefined'){
+			if(typeof options.title === "undefined"){
 				// Attempt to grab title from page contents.
 				if(options.container.getElementsByTagName('title').length !== 0){
 					options.title = options.container.getElementsByTagName('title')[0].innerHTML;
@@ -303,10 +303,10 @@
 		try {xmlhttp = window.XMLHttpRequest?new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");}  catch (e) { }
 			// Add state listener.
 			xmlhttp.onreadystatechange = function(){
-				if ((xmlhttp.readyState == 4) && (xmlhttp.status == 200)) {
+				if ((xmlhttp.readyState === 4) && (xmlhttp.status === 200)) {
 					// Success, Return html
 					callback(xmlhttp.responseText);
-				}else if((xmlhttp.readyState == 4) && (xmlhttp.status == 404 || xmlhttp.status == 500)){
+				}else if((xmlhttp.readyState === 4) && (xmlhttp.status === 404 || xmlhttp.status === 500)){
 					// error (return false)
 					callback(false);
 				}
@@ -352,7 +352,7 @@
 		opt.partial = false;
 
 		// Ensure a url and container have been provided.
-		if(typeof options.url == 'undefined' || typeof options.container == 'undefined'){
+		if(typeof options.url === "undefined" || typeof options.container === "undefined"){
 			console.log("URL and Container must be provided.");
 			return false;
 		}
@@ -368,24 +368,24 @@
 
 		// Parse Links on load? Enabled by default.
 		// (Proccess pages loaded via shushjax and setup shushjax on any links found.)
-		if(typeof options.parseLinksOnload == 'undefined'){
+		if(typeof options.parseLinksOnload === "undefined"){
 			options.parseLinksOnload = opt.parseLinksOnload;
 		}
 
 		// Use partial file support? Disabled by default
-		if(typeof options.partial == 'undefined'){
+		if(typeof options.partial === "undefined"){
 			options.partial = opt.partial;
 		}
 
 		// Smart load (enabled by default.) Trys to ensure the correct HTML is loaded.
 		// If you are certain your backend will only return shushjax ready content this can be disabled
 		// for a slight perfomance boost.
-		if(typeof options.smartLoad == 'undefined'){
+		if(typeof options.smartLoad === "undefined"){
 			options.smartLoad = opt.smartLoad;
 		}
 
 		// Get container (if its an id, convert it to a dom node.)
-		if(typeof options.container == 'string' ) {
+		if(typeof options.container === 'string' ) {
 			container = document.getElementById(options.container);
 			if(container === null){
 				console.log("Could not find container with id:"+options.container);
@@ -395,16 +395,16 @@
 		}
 
 		// If everything went ok thus far, connect up listeners
-		if(typeof options.beforeSend == 'function'){
+		if(typeof options.beforeSend === 'function'){
 			internal.addEvent(options.container, 'beforeSend', options.beforeSend);
 		}
-		if(typeof options.complete == 'function'){
+		if(typeof options.complete === 'function'){
 			internal.addEvent(options.container, 'complete', options.complete);
 		}
-		if(typeof options.error == 'function'){
+		if(typeof options.error === 'function'){
 			internal.addEvent(options.container, 'error', options.error);
 		}
-		if(typeof options.success == 'function'){
+		if(typeof options.success === 'function'){
 			internal.addEvent(options.container, 'success', options.success);
 		}
 		// Return valid options
@@ -437,13 +437,13 @@
 		// connect();
 		var options = {};
 		// connect(container, class_to_apply_to)
-		if(arguments.length == 2){
+		if(arguments.length === 2){
 			options.container = arguments[0];
 			options.useClass = arguments[1];
 		}
 		// Either json or container id
-		if(arguments.length == 1){
-			if(typeof arguments[0] == 'string' ) {
+		if(arguments.length === 1){
+			if(typeof arguments[0] === 'string' ) {
 				// connect(container_id)
 				options.container = arguments[0];
 			}else{
@@ -456,7 +456,7 @@
 		delete options.history;
 		
 		internal.options = options;
-		if(document.readyState == 'complete') {
+		if(document.readyState === 'complete') {
 			internal.parseLinks(document, options);
 		} else {
 			// Dont run until the window is ready.
@@ -477,7 +477,7 @@
 	 */
 	this.invoke = function(/* options */){
 		// url, container
-		if(arguments.length == 2){
+		if(arguments.length === 2){
 			options = {};
 			options.url = arguments[0];
 			options.container = arguments[1];
