@@ -43,28 +43,36 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                     <h3>Insert a link to shushjax in your <code>&lt;head&gt;</code></h3>
                     <p>
                         Place the shushjax script on your webserver, then add a link in the <code>&lt;head&gt;</code> of your html, like this:
-                        <pre><code>
-                        <html>
-                        <head>
+                        <pre><code>&lt;html&gt;
+                        &lt;head&gt;
                         ...
-                        <script src="/shushjax.js"></script>
+                        &lt;script src=&quot;/shushjax.js&quot;&gt;&lt;/script&gt;
                         ...
-                        </head>
-                        <body>
+                        &lt;/head&gt;
+                        &lt;body&gt;
                         ...
-                        </body>
-                        </html>
-                        </code></pre>
+                        &lt;/body&gt;
+                        &lt;/html&gt;</code></pre>
                     </p>
-                    <p><h4><button class="pure-button">CDN</button>Coming Soon: Use a CDN</h4></p>
+                    <p><h4><button class="pure-button pure-button-primary">CDN</button> Coming Soon: Use a CDN</h4></p>
                 </div>
                 <div class="l-box">
                     <h4 class="content-subhead" id="quick_config_content">Configure content</h4>
 
                     <h3>Tell shushjax what content to load</h3>
                     <p>
-shushjax will only replace content that you configure. 
-<pre><code>shushjax.connect({container: 'content'});</code></pre>
+                        shushjax will only replace content that you configure. 
+                        <pre><code>&lt;html&gt;
+                        &lt;head&gt;
+                        ...
+                        &lt;script src=&quot;/shushjax.js&quot;&gt;&lt;/script&gt;
+                        &lt;script&gt;shushjax.connect({'container': 'content',});&lt;/script&gt;
+                        ...
+                        &lt;/head&gt;
+                        &lt;body&gt;
+                        ...
+                        &lt;/body&gt;
+                        &lt;/html&gt;</code></pre>
                     </p>
                 </div>
                 <div class="l-box">
