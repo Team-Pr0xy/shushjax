@@ -120,6 +120,12 @@ td.unsupported{
 td.broken{
     background-color: red;
 }
+.hash_anchor {
+    position: relative;
+}
+.hash_anchor:target {
+    padding-top: 60px;
+}
 .fa-6x {
   font-size: 6em;
 }
