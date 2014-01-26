@@ -108,16 +108,16 @@ pre {
     border-style: solid;
     padding: 1em;
 }
-.supported td{
+td.supported{
     background-color: green;
 }
-.seamless td{
+td.seamless{
     background-color: yellow;
 }
-.unsupported td{
+td.unsupported{
     background-color: orange;
 }
-.broken td{
+td.broken{
     background-color: red;
 }
 .fa-6x {
