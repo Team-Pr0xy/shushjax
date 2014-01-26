@@ -114,6 +114,28 @@ shushjax will only replace content that you configure.
                     </p>
                 </div>
                 <div class="l-box">
+                    <h4 class="content-subhead" id="full_options">Options</h4>
+
+                    <h3>Further configuration</h3>
+                    <p>
+                    shushjax has several options that you can specify during the initialization:
+                    <ul>
+                        <li><strong>smartLoad</strong> Ensure that the returned HTML is usable. true|false Enabled by default. You can disable this for a slight performance boost if you are absolutely sure that the returned HTML is a properly formatted partial file. It's suggested that you keep this enabled so that shushjax can automatically work around problems with the returned page. 
+                            <pre><code>'smartLoad': true,</code></pre>
+                        </li>
+                        <li><strong>useClass</strong> Only activate shushjax on links with the provided class. Using this can make implementing shushjax easier on complex sites. 
+                            <pre><code>'useClass': 'shushjax-enabled',</code></pre>
+                        </li>
+                        <li><strong>partial</strong> Use partial file support. true|false Disabled by default. When enabled, shushjax will load pages using partial files located under the /partials directory. 
+                            <pre><code>'partial': true,</code></pre>
+                        </li>
+                        <li><strong>parseLinksOnload</strong> Make links on loaded pages use shushjax. true|false Enabled by default. 
+                            <pre><code>'parseLinksOnload': true,</code></pre>
+                        </li>
+                    </ul>
+                    </p>
+                </div>
+                <div class="l-box">
                     <h4 class="content-subhead" id="full_partial">Use Partial Files</h4>
 
                     <h3>Tell shushjax what content to load</h3>
@@ -162,7 +184,8 @@ shushjax will only replace content that you configure.
         <li class="pure-menu-heading"><a href="#full">Full Documentation</a></li>
         <li><a href="#full_core">Core concepts</a></li>
         <li><a href="#full_caveats">Caveats</a></li>
-        <li><a href="#full_setup">Setup options</a></li>
+        <li><a href="#full_setup">Setup</a></li>
+        <li><a href="#full_options">Options</a></li>
         <li><a href="#full_partial">Partial files</a></li>
         <li><a href="#full_callbacks">Callbacks</a></li>
         <li><a href="#full_programmatic">Programmatic Usage</a></li>
