@@ -106,6 +106,14 @@ shushjax will only replace content that you configure.
                     </p>
                 </div>
                 <div class="l-box">
+                    <h4 class="content-subhead" id="full_browsers">Compatability</h4>
+
+                    <h3>Browser support</h3>
+                    <p>
+                    shushjax is designed with a series of graceful fallbacks. When a browser doesn't support part of shushjax, the code disables itself and pages load normally. 
+                    </p>
+                </div>
+                <div class="l-box">
                     <h4 class="content-subhead" id="full_setup">Setup</h4>
 
                     <h3>Tell shushjax what content to load</h3>
@@ -118,7 +126,8 @@ shushjax will only replace content that you configure.
 
                     <h3>Further configuration</h3>
                     <p>
-                    shushjax has several options that you can specify during the initialization:
+                    shushjax has several options that you can specify during the initialization call, like this
+                    <pre><code>&lt;script&gt;shushjax.connect({options});&lt;/script&gt;</code></pre>
                     <ul>
                         <li><strong>smartLoad</strong> <em>true|false</em> Ensure that the returned HTML is usable. Enabled by default. You can disable this for a slight performance boost if you are absolutely sure that the returned HTML is a properly formatted partial file. It's suggested that you keep this enabled so that shushjax can automatically work around problems with the returned page. 
                             <pre><code>'smartLoad': true,</code></pre>
@@ -184,6 +193,7 @@ shushjax will only replace content that you configure.
         <li class="pure-menu-heading"><a href="#full">Full Documentation</a></li>
         <li><a href="#full_core">Core concepts</a></li>
         <li><a href="#full_caveats">Caveats</a></li>
+        <li><a href="#full_browsers">Browser support</a></li>
         <li><a href="#full_setup">Setup</a></li>
         <li><a href="#full_options">Options</a></li>
         <li><a href="#full_partial">Partial files</a></li>
