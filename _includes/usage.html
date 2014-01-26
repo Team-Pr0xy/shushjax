@@ -111,6 +111,81 @@ shushjax will only replace content that you configure.
                     <h3>Browser support</h3>
                     <p>
                     shushjax is designed with a series of graceful fallbacks. When a browser doesn't support part of shushjax, the code disables itself and pages load normally. 
+                    <h4>Support table</h4>
+                    Note that the entries in this table are estimates, as shushjax has not yet been extensively tested
+                    <table class="pure-table pure-table-bordered">
+                        <thread>
+                            <tr>
+                                <th>Internet Explorer</th>
+                                <th>Chrome</th>
+                                <th>Firefox</th>
+                                <th>Safari</th>
+                                <th>Opera</th>
+                                <th>iOS</th>
+                                <th>Android</th>
+                            </tr>
+                        </thread>
+                        <tbody>
+                            <tr>
+                                <td>6</td>
+                                <td>4</td>
+                                <td>2+</td>
+                                <td>3.1+</td>
+                                <td>9.0+</td>
+                                <td>3.2+</td>
+                                <td>2.2+</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>5+</td>
+                                <td>4+</td>
+                                <td>5+</td>
+                                <td>11.5+</td>
+                                <td>5+</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>18+</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>4.0</td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>4.1</td>
+                            </tr>
+                            <tr>
+                                <td>10+</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>4.2+</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h4>Explanation of support terms</h4>
+                    <ul>
+                        <li><strong>Supported</strong> shushjax works as intended</li>
+                        <li><strong>Limited partial file support</strong> Partial files have limited support, but browsers will automatically fall back to loading whole pages if needed. 
+                            <ul>
+                                <li><strong>webkitURL()</strong> Some browsers implement URL() as webkitURL(). shushjax automatically detects and uses it instead. </li>
+                                <li><strong>no URL() support</strong> Making the partial file request requires that the browser supports URL(). If not, partial file support will be automatically disabled. </li>
+                            </ul></li>
+                        <li><strong>Seamless fallback</strong> The functions used by shushjax are unsupported, but shushjax automatically disables itself and links load like they would without shushjax. </li>
+                        <li><strong>Unsupported</strong> This browser may or may not work, but it receives no testing or bugfixes. </li>
+                        <li><strong>Old versions of Internet Explorer</strong> Along with Windows XP, Internet Explorer versions 6, 7, and 8 are end-of-life as of April 8, 2014. At this time, these browsers will be officially unsupported. Although the code for them will remain and they may continue to work, they will not receive testing or bugfixes. </li>
+                        <li><strong>Broken</strong> shushjax causes severe breakage</li>
+                    </ul>
                     </p>
                 </div>
                 <div class="l-box">
