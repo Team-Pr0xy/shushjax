@@ -127,40 +127,40 @@ shushjax will only replace content that you configure.
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="unsupported">6</td>
-                                <td class="seamless">4+</td>
-                                <td class="seamless">2+</td>
-                                <td class="seamless">3.1+</td>
-                                <td class="seamless">9.0+</td>
-                                <td class="seamless">3.2+</td>
+                                <td class="unsupported">6 <i class="fa fa-ban"></i></td>
+                                <td></td>
+                                <td class="seamless">2+ <i class="fa fa-check-circle-o"></i></td>
+                                <td class="seamless">3.1+ <i class="fa fa-check-circle-o"></i></td>
+                                <td class="seamless">9.0+ <i class="fa fa-check-circle-o"></i></td>
+                                <td class="seamless">3.2+ <i class="fa fa-check-circle-o"></i></td>
                                 <td class="supported">2.2+ <i class="fa fa-check"></i><i class="fa fa-asterisk"></i></td>
                             </tr>
                             <tr>
-                                <td class="seamless">7</td>
-                                <td class="supported">5+ <i class="fa fa-check"></i></td>
+                                <td class="seamless">7 <i class="fa fa-clock-o"></i><i class="fa fa-check-circle-o"></i></td>
+                                <td class="seamless">5+ <i class="fa fa-check-circle-o"></i></td>
                                 <td class="supported">4+ <i class="fa fa-check"></i><i class="fa fa-asterisk"></i></td>
-                                <td class="supported">5+ <i class="fa fa-check"></i><i class="fa fa-asterisk"></i></td>
+                                <td class="supported">6+ <i class="fa fa-check"></i><i class="fa fa-asterisk"></i></td>
                                 <td class="supported">11.5+ <i class="fa fa-check"></i><i class="fa fa-asterisk"></i></td>
                                 <td class="supported">5+ <i class="fa fa-check"></i><i class="fa fa-asterisk"></i></td>
-                                <td class="seamless">3</td>
+                                <td class="seamless">3 <i class="fa fa-check-circle-o"></i></td>
                             </tr>
                             <tr>
-                                <td class="seamless">8</td>
+                                <td class="seamless">8 <i class="fa fa-clock-o"></i><i class="fa fa-check-circle-o"></i></td>
                                 <td class="supported">18+ <i class="fa fa-check"></i><i class="fa fa-asterisk"></i></td>
                                 <td class="supported">19+ <i class="fa fa-check"></i></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td class="seamless">4.0</td>
+                                <td class="seamless">4.0 <i class="fa fa-check-circle-o"></i></td>
                             </tr>
                             <tr>
-                                <td class="seamless">9</td>
+                                <td class="seamless">9 <i class="fa fa-check-circle-o"></i></td>
                                 <td class="supported">32+ <i class="fa fa-check"></i></td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td class="seamless">4.1</td>
+                                <td class="seamless">4.1 <i class="fa fa-check-circle-o"></i></td>
                             </tr>
                             <tr>
                                 <td class="supported">10+ <i class="fa fa-check"></i></td>
@@ -175,16 +175,16 @@ shushjax will only replace content that you configure.
                     </table>
                     <h4>Explanation of support terms</h4>
                     <ul>
-                        <li><strong>Supported <i class="fa fa-check"></i></strong> shushjax works as intended</li>
+                        <li><strong style="color:green;">Supported <i class="fa fa-check"></i></strong> shushjax works as intended</li>
                         <li><strong>Limited partial file support <i class="fa fa-asterisk"></i></strong> Partial files have limited support, but browsers will automatically fall back to loading whole pages if needed. 
                             <ul>
                                 <li><strong>webkitURL()</strong> Some browsers implement URL() as webkitURL(). shushjax automatically detects and uses it instead. </li>
                                 <li><strong>no URL() support</strong> Making the partial file request requires that the browser supports URL(). If not, partial file support will be automatically disabled. </li>
                             </ul></li>
-                        <li><strong>Seamless fallback</strong> The functions used by shushjax are unsupported, but shushjax automatically disables itself and links load like they would without shushjax. </li>
-                        <li><strong>Unsupported</strong> This browser may or may not work, but it receives no testing or bugfixes. </li>
-                        <li><strong>Old versions of Internet Explorer</strong> Along with Windows XP, Internet Explorer versions 6, 7, and 8 are end-of-life as of April 8, 2014. At this time, these browsers will be officially unsupported. Although the code for them will remain and they may continue to work, they will not receive testing or bugfixes. </li>
-                        <li><strong>Broken</strong> shushjax causes severe breakage</li>
+                        <li><strong style="color:yellow;">Seamless fallback <i class="fa fa-check-circle-o"></i></strong> The functions used by shushjax are unsupported, but shushjax automatically disables itself and links load like they would without shushjax. </li>
+                        <li><strong style="color:orange;">Unsupported <i class="fa fa-ban"></i></strong> This browser may or may not work, but it receives no testing or bugfixes. </li>
+                        <li><strong>Old versions of Internet Explorer <i class="fa fa-clock-o"></i></strong> Along with Windows XP, Internet Explorer versions 6, 7, and 8 are end-of-life as of April 8, 2014. At this time, these browsers will be officially unsupported. Although the code for them will remain and they may continue to work, they will not receive testing or bugfixes. </li>
+                        <li><strong style="color:red;">Broken <i class="fa fa-times"></i></strong> shushjax causes severe breakage</li>
                     </ul>
                     </p>
                 </div>
