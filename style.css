@@ -104,6 +104,8 @@ body .primary-button {
 pre {
     background: #CCCCCC;
     border: #292929;
+    border-width: .1em;
+    border-style: solid;
     padding: 1em;
 }
 .fa-6x {
