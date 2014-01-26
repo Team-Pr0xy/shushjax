@@ -33,6 +33,9 @@ body .primary-button {
     color: #fff;
 }
 
+body a:link, body a:visited, body a:hover, body a:active {
+    color: #000029;
+
 .splash {
     margin: 2em auto 0;
     padding: 3em 0.5em;
