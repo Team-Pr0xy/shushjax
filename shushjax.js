@@ -1,6 +1,5 @@
 /**
  * shushjax
- *
  * A standalone implementation of Pushstate AJAX, for non-JQuery webpages.
  * @version 0.1
  * @author JC Hulce
@@ -8,20 +7,16 @@
  * @license MIT
  */
 (function(){
-
 	// Object to store private values/methods.
 	var internal = {
 		// Is this the first usage of shushjax? (Ensure history entery has required values if so.)
 		"firstrun": true,
-		// Borrowed wholesale from https://github.com/defunkt/jquery-pjax
 		// Attempt to check that a device supports pushstate before attempting to use it.
 		"is_supported": window.history && window.history.pushState && window.history.replaceState && !navigator.userAgent.match(/((iPod|iPhone|iPad).+\bOS\s+[1-4]|WebApps\/.+CFNetwork)/)
 	};
-	
 	/**
 	 * AddEvent
 	 * Cross browser compatable method to add event listeners
-	 *
 	 * @scope private
 	 * @param obj Object to listen on
 	 * @param event Event to listen for.
@@ -36,12 +31,10 @@
 				obj.attachEvent('on'+event, callback);
 		}
 	};
-
 	/**
 	 * Clone
-	 * Util method to create copys of the options object (so they do not share references)
+	 * Util method to create copies of the options object (so they do not share references)
 	 * This allows custom settings on differnt links.
-	 *
 	 * @scope private
 	 * @param obj
 	 * @return obj
@@ -54,11 +47,9 @@
 		}
 		return object;
 	};
-
 	/**
 	 * triggerEvent
 	 * Fire an event on a given object (used for callbacks)
-	 *
 	 * @scope private
 	 * @param node. Objects to fire event on
 	 * @return event_name. type of event
@@ -82,13 +73,11 @@
 	 */
 	internal.addEvent(window, 'popstate', function(st){
 		if(st.state !== null){
-
 			var opt = {	
 				'url': st.state.url, 
 				'container': st.state.container, 
 				'history': false
 			};
-
                         // Merge original in original connect options
                         if(typeof internal.options !== "undefined"){
                                 for(var a in internal.options){ 
@@ -104,7 +93,6 @@
 			internal.handle(options);
 		}
 	});
-
 	/**
 	 * attach
 	 * Attach shushjax listeners to a link.
@@ -113,28 +101,19 @@
 	 * @param content_node. 
 	 */
 	internal.attach = function(node, options){
-
 		// if no pushstate support, dont attach and let stuff work as normal.
 		if(!internal.is_supported) return;
-
 		// Ignore external links.
 		if ( node.protocol !== document.location.protocol ||
 			node.host !== document.location.host ){
 			return;
 		}
-		
 		// Ignore anchors on the same page
-		// From https://github.com/defunkt/jquery-pjax/pull/83/files
-                // if ( document.location.hash && document.location.replace(document.location.hash, '') ===
-                // document.location.replace(document.location.hash, '') )
-                // return true;
                 if(node.pathname === location.pathname && node.hash.length > 0) {
                          return true;
                  }
-                
 		// Add link href to object
 		options.url = node.href;
-		
 		// If data-shushjax is specified, use as container
 		if(node.getAttribute('data-shushjax')){
 			options.container = node.getAttribute('data-shushjax');
@@ -146,7 +125,6 @@
 		// Check options are valid.
 		options = internal.parseOptions(options);
 		if(options === false) return;
-
 		// Attach event.
 		internal.addEvent(node, 'click', function(event){
 			// Allow middle click (pages in new windows)
@@ -186,9 +164,8 @@
 	/**
 	 * SmartLoad
 	 * Smartload checks the returned HTML to ensure shushjax ready content has been provided rather than
-     * a full HTML page. If a full HTML has been returned, it will attempt to scan the page and extract
-     * the correct html to update our container with in order to ensure shushjax still functions as expected.
-	 *
+	 * a full HTML page. If a full HTML has been returned, it will attempt to scan the page and extract
+	 * the correct html to update our container with in order to ensure shushjax still functions as expected.
 	 * @scope private
 	 * @param html (HTML returned from AJAX)
 	 * @param options (Options object used to request page)
@@ -199,11 +176,10 @@
 		var tmp = document.createElement('div');
 		// Add html
 		tmp.innerHTML = html; 
-		
-			// Grab the title if there is one (maintain IE7 compatability)
-            var title = tmp.getElementsByTagName('title')[0].innerHTML;
-            if(title)
-           document.title = title;
+		// Grab the title if there is one (maintain IE7 compatability)
+		var title = tmp.getElementsByTagName('title')[0].innerHTML;
+		if(title)
+		document.title = title;
 		//Look through all returned divs.
 		tmpNodes = tmp.getElementsByTagName('div');
 		for(var i=0;i<tmpNodes.length;i++){
@@ -219,7 +195,6 @@
 		// If our container was not found, HTML will be returned as is.
 		return html;
 	};
-
 	/**
 	 * handle
 	 * Handle requests to load content via shushjax.
@@ -229,27 +204,18 @@
 	 * @param addtohistory. Does this load require a history event.
 	 */
 	internal.handle = function(options){
-		
 		// Fire beforeSend Event.
 		internal.triggerEvent(options.container, 'beforeSend');
-		
-		// Are we loading partial pages?
-		// if(options.partial){ options.geturl = url.location.protocol + "//" + url.location.host + "/partials" + url.location.pathname;}else{ options.geturl = options.url; }
-
 		// Do the request
 		internal.request(options.url, options.partial, function(html){
-
 			// Ensure we have the correct HTML to apply to our container.
 			if(options.smartLoad) html = internal.smartLoad(html, options);
-			
 			// Update the dom with the new content
 			options.container.innerHTML = html;
-
 			// Initalise any links found within document (if enabled).
 			if(options.parseLinksOnload){
 				internal.parseLinks(options.container, options);
 			}
-			
 			// If no title was provided
 			if(typeof options.title === "undefined"){
 				// Attempt to grab title from page contents.
@@ -259,7 +225,6 @@
 					options.title = document.title;
 				}
 			}
-			
 			// Do we need to add this to the history?
 			if(options.history){
 				// If this is the first time shushjax has run, create a state object for the current page.
@@ -270,7 +235,6 @@
 				// Update browser history
 				window.history.pushState({'url': options.url, 'container': options.container.id }, options.title , options.url);
 			}
-
 			// Fire Events
 			internal.triggerEvent(options.container,'complete');
 			if(html === false){ //Somthing went wrong
@@ -279,21 +243,15 @@
 			}else{ //got what we expected.
 				internal.triggerEvent(options.container,'success');
 			}
-
-			// If Google analytics is detected push a trackPageView, so shushjax pages can 
-			// be tracked successfully.
+			// If Google analytics is detected push a trackPageView, so shushjax pages can be tracked successfully.
 			if(window._gaq) _gaq.push(['_trackPageview']);
-
 			// Set new title
 			document.title = options.title;
 		});
-		
 	};
-
 	/**
 	 * Request
-	 * Performs AJAX request to page and returns the result..
-	 *
+	 * Performs AJAX request to page and returns the result.
 	 * @scope private
 	 * @param location. Page to request.
 	 * @param callback. Method to call when a page is loaded.
@@ -313,7 +271,6 @@
 			};
 			// re-format the URL so we can modify it
 			// Check for browser support of URL()
-			// if(! formaturl = new URL(location);) partial = false;
 			if (typeof(URL) === "function") {
 			formaturl = new URL(location);
 			// Some browsers implement URL() as webkitURL()
@@ -331,14 +288,11 @@
 			// Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); // shushjax header, kept so you can see usage in server logs
 			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Standard AJAX header.
-
 			xmlhttp.send(null);
 	};
-
 	/**
 	 * parseOptions
 	 * Validate and correct options object while connecting up any listeners.
-	 *
 	 * @scope private
 	 * @param options
 	 * @return false | valid options object
@@ -350,13 +304,11 @@
 		opt.parseLinksOnload = true;
 		opt.smartLoad = true;
 		opt.partial = false;
-
 		// Ensure a url and container have been provided.
 		if(typeof options.url === "undefined" || typeof options.container === "undefined"){
 			console.log("URL and Container must be provided.");
 			return false;
 		}
-
 		// Find out if history has been provided
 		if(typeof options.history === 'undefined'){
 			// use default
@@ -365,25 +317,21 @@
 			// Ensure its bool.
 			options.history = (!(options.history === false));
 		}
-
 		// Parse Links on load? Enabled by default.
 		// (Proccess pages loaded via shushjax and setup shushjax on any links found.)
 		if(typeof options.parseLinksOnload === "undefined"){
 			options.parseLinksOnload = opt.parseLinksOnload;
 		}
-
 		// Use partial file support? Disabled by default
 		if(typeof options.partial === "undefined"){
 			options.partial = opt.partial;
 		}
-
 		// Smart load (enabled by default.) Trys to ensure the correct HTML is loaded.
 		// If you are certain your backend will only return shushjax ready content this can be disabled
 		// for a slight perfomance boost.
 		if(typeof options.smartLoad === "undefined"){
 			options.smartLoad = opt.smartLoad;
 		}
-
 		// Get container (if its an id, convert it to a dom node.)
 		if(typeof options.container === 'string' ) {
 			container = document.getElementById(options.container);
@@ -393,7 +341,6 @@
 			}
 			options.container = container;
 		}
-
 		// If everything went ok thus far, connect up listeners
 		if(typeof options.beforeSend === 'function'){
 			internal.addEvent(options.container, 'beforeSend', options.beforeSend);
@@ -410,22 +357,14 @@
 		// Return valid options
 		return options;
 	};
-
 	/**
 	 * connect
 	 * Attach links to shushjax handlers.
 	 * @scope public
-	 *
 	 * Can be called in 3 ways.
-	 * Calling as connect(); 
-	 * Will look for links with the data-shushjax attribute.
-	 *
-	 * Calling as connect(container_id)
-	 * Will try to attach to all links, using the container_id as the target.
-	 *
-	 * Calling as connect(container_id, class_name)
-	 * Will try to attach any links with the given classname, using container_id as the target.
-	 *
+	 * Calling as connect(); will look for links with the data-shushjax attribute.
+	 * Calling as connect(container_id) will try to attach to all links, using the container_id as the target.
+	 * Calling as connect(container_id, class_name) will try to attach any links with the given classname, using container_id as the target.
 	 * Calling as connect({	
 	 * 'url':'somepage.php',
 	 * 'container':'somecontainer',
@@ -454,7 +393,6 @@
 		// Delete history and title if provided. These options should only be provided via invoke();
 		delete options.title;
 		delete options.history;
-		
 		internal.options = options;
 		if(document.readyState === 'complete') {
 			internal.parseLinks(document, options);
@@ -466,12 +404,10 @@
 			});
 		}
 	};
-	
 	/**
 	 * invoke
 	 * Directly invoke a shushjax page load.
 	 * invoke({url: 'file.php', 'container':'content'});
-	 *
 	 * @scope public
 	 * @param options  
 	 */
@@ -494,7 +430,6 @@
 		// If everything went ok, activate shushjax.
 		if(options !== false) internal.handle(options);
 	};
-
 	var shushjax_obj = this;
         if (typeof define === 'function' && define.amd) {
                 // register shushjax as AMD module
@@ -505,6 +440,4 @@
                 // Make shushjax object accessible in global namespace
                 window.shushjax = shushjax_obj;
         }
-
-
 }).call({});
