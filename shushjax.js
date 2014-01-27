@@ -9,7 +9,7 @@
 (function(){
 	// Object to store private values/methods.
 	var internal = {
-		// Is this the first usage of shushjax? (Ensure history entery has required values if so.)
+		// Is this the first usage of shushjax? (Ensure history entry has required values if so.)
 		"firstrun": true,
 		// Attempt to check that a device supports pushstate before attempting to use it.
 		"is_supported": window.history && window.history.pushState && window.history.replaceState && !navigator.userAgent.match(/((iPod|iPhone|iPad).+\bOS\s+[1-4]|WebApps\/.+CFNetwork)/)
@@ -25,9 +25,11 @@
 	internal.addEvent = function(obj, event, callback){
 		if(window.addEventListener){
 				// Browsers that don't suck
+				console.log("Adding shushjax event listeners");
 				obj.addEventListener(event, callback, false);
 		}else{
 				// IE8/7
+				console.info("Adding fallback event listeners for old IE versions");
 				obj.attachEvent('on'+event, callback);
 		}
 	};
@@ -56,15 +58,16 @@
 	 */
 	internal.triggerEvent = function(node, event_name){
 		if (document.createEvent) {
-			// Good browsers
-			evt = document.createEvent("HTMLEvents");
+		// Good browsers
+		evt = document.createEvent("HTMLEvents");
 		evt.initEvent(event_name, true, true);
 		node.dispatchEvent(evt);
 		}else{
-			// old IE versions
-			evt = document.createEventObject();
+		// old IE versions
+		evt = document.createEventObject();
 		evt.eventType = 'on'+ event_name;
 		node.fireEvent(evt.eventType, evt);
+		console.info("Using createEvent fallbacks for old IE versions");
 		}
 	};
 	/**
@@ -88,9 +91,14 @@
                         // Convert state data to shushjax options
                         var options = internal.parseOptions(opt);
 			// If somthing went wrong, return.
-			if(options === false) return;
+			if(options === false){
+			console.error("Failed to read state data");
+			internal.triggerEvent(options.container,'error');
+			return;
+			}
 			// If there is a state object, handle it as a page load.
 			internal.handle(options);
+			console.log("Handling state object");
 		}
 	});
 	/**
@@ -102,29 +110,40 @@
 	 */
 	internal.attach = function(node, options){
 		// if no pushstate support, dont attach and let stuff work as normal.
-		if(!internal.is_supported) return;
+		if(!internal.is_supported){
+		console.info("No pushstate support in browser. shushjax is disabled.");
+		return;
+		}
 		// Ignore external links.
 		if ( node.protocol !== document.location.protocol ||
 			node.host !== document.location.host ){
+			console.log("Ignoring external anchor " + node.href);
 			return;
 		}
 		// Ignore anchors on the same page
                 if(node.pathname === location.pathname && node.hash.length > 0) {
-                         return true;
+                        console.log("Ignoring same-page anchor " + node.hash);
+                        return true;
                  }
 		// Add link href to object
 		options.url = node.href;
 		// If data-shushjax is specified, use as container
 		if(node.getAttribute('data-shushjax')){
 			options.container = node.getAttribute('data-shushjax');
+			console.log("Using " + options.container + " as container for " + node.href + " as specified with data-shushjax");
 		}
 		// If data-title is specified, use as title.
 		if(node.getAttribute('data-title')){
 			options.title = node.getAttribute('data-title');
+			console.log("Using " + options.title + " as title for " + node.href + " as specified with data-title");
 		}
 		// Check options are valid.
 		options = internal.parseOptions(options);
-		if(options === false) return;
+		if(options === false){
+                        console.error("Invalid options error");
+                        internal.triggerEvent(options.container,'error');
+		return;
+		}
 		// Attach event.
 		internal.addEvent(node, 'click', function(event){
 			// Allow middle click (pages in new windows)
@@ -132,7 +151,10 @@
 			// Dont fire normal event
 			if(event.preventDefault){event.preventDefault();}else{event.returnValue = false;}
 			// Take no action if we are already on said page?
-			if(document.location.href === options.url) return false;
+			if(document.location.href === options.url){
+			console.log("Ignoring same-page anchor " + options.url);
+			return false;
+			}
 			// handle the load.
 			internal.handle(options);
 		});
@@ -148,9 +170,11 @@
 		if(typeof options.useClass !== "undefined"){
 			// Get all nodes with the provided classname.
 			nodes = dom_obj.getElementsByClassName(options.useClass);
+			console.log("Attaching to links with class=" + options.useClass);
 		}else{
 			// If no class was provided, just get all the links
 			nodes = dom_obj.getElementsByTagName('a');
+			console.log("Attaching to all links, useClass is unspecified");
 		}
 		// For all returned nodes
 		for(var i=0,tmp_opt; i < nodes.length; i++){
@@ -178,21 +202,25 @@
 		tmp.innerHTML = html; 
 		// Grab the title if there is one (maintain IE7 compatability)
 		var title = tmp.getElementsByTagName('title')[0].innerHTML;
-		if(title)
+		if(title){
+		console.log("Using returned document title: " + title);
 		document.title = title;
+		}
 		//Look through all returned divs.
 		tmpNodes = tmp.getElementsByTagName('div');
 		for(var i=0;i<tmpNodes.length;i++){
 			if(tmpNodes[i].id === options.container.id){
 				// If our container div is within the returned HTML, we both know the returned content is
-				// not shushjax ready, but instead likely the full HTML content. in Addition we can also guess that
+				// not partial pages ready, but instead likely the full HTML content. In addition we can also guess that
 				// the content of this node is what we want to update our container with.
 				// Thus use this content as the HTML to append in to our page via shushjax.
+				console.info("Found container div in the returned HTML, treating as full HTML content and processing with smartLoad");
 				return tmpNodes[i].innerHTML; 
 				break;
 			}
 		}
 		// If our container was not found, HTML will be returned as is.
+		console.log("Didn't find container div in the returned HTML, processing as a partial page");
 		return html;
 	};
 	/**
@@ -208,6 +236,11 @@
 		internal.triggerEvent(options.container, 'beforeSend');
 		// Do the request
 		internal.request(options.url, options.partial, function(html){
+                        // If no HTML was provided
+                        if(html === false || html === "undefined"){ //Somthing went wrong
+				internal.triggerEvent(options.container,'requestError');
+				return;
+			}
 			// Ensure we have the correct HTML to apply to our container.
 			if(options.smartLoad) html = internal.smartLoad(html, options);
 			// Update the dom with the new content
@@ -237,14 +270,16 @@
 			}
 			// Fire Events
 			internal.triggerEvent(options.container,'complete');
-			if(html === false){ //Somthing went wrong
+			if(html === false || html === "undefined"){ //Somthing went wrong
 				internal.triggerEvent(options.container,'error');
 				return;
 			}else{ //got what we expected.
 				internal.triggerEvent(options.container,'success');
 			}
 			// If Google analytics is detected push a trackPageView, so shushjax pages can be tracked successfully.
-			if(window._gaq) _gaq.push(['_trackPageview']);
+			if(window._gaq){
+			_gaq.push(['_trackPageview']);
+			}
 			// Set new title
 			document.title = options.title;
 		});
@@ -254,36 +289,69 @@
 	 * Performs AJAX request to page and returns the result.
 	 * @scope private
 	 * @param location. Page to request.
+	 * @param partial. Use partial pages?
 	 * @param callback. Method to call when a page is loaded.
 	 */
 	internal.request = function(location, partial, callback){
 		// Create xmlHttpRequest object.
-		try {xmlhttp = window.XMLHttpRequest?new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");}  catch (e) { }
-			// Add state listener.
+		xmlhttp = window.XMLHttpRequest?new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
+			// Check if the browser supports XHR2
+			if (typeof xmlhttp.onload !== "undefined"){
+			console.log("Using XHR2");
+			xmlhttp.onload = function(){ // Successful load
+			console.log("Fetch complete, HTTP status code " + xmlhttp.status);
+			callback(xmlhttp.responseText); // Success, Return HTML
+			};
+			xmlhttp.onerror = function(){ // Error during loading
+			if (xmlhttp.status === 0){
+			console.error("Failed to connect to the server, network error " + xmlhttp.status);
+			}else{
+			console.error("Fetch error, HTTP status code " + xmlhttp.status);
+			}
+			// return error page if present
+			callback(xmlhttp.responseText);
+			return false; // Failure, return false
+			};
+			}else{ // old browsers that don't support XHR2
+			console.info("Falling back to basic XHR");
+			// Add the old state listener
 			xmlhttp.onreadystatechange = function(){
 				if ((xmlhttp.readyState === 4) && (xmlhttp.status === 200)) {
 					// Success, Return html
 					callback(xmlhttp.responseText);
-				}else if((xmlhttp.readyState === 4) && (xmlhttp.status === 404 || xmlhttp.status === 500)){
-					// error (return false)
-					callback(false);
-				}
+					console.log("Fetch complete");
+				}else if((xmlhttp.readyState === 4) && (xmlhttp.status !== 200)){
+					// error, return error page if present
+					console.error("Fetch error, HTTP status code " + xmlhttp.status);
+					callback(xmlhttp.responseText);
+					return false;} // Failure, return false
+				};
 			};
 			// re-format the URL so we can modify it
 			// Check for browser support of URL()
-			if (typeof(URL) === "function") {
+			if (typeof(URL) === "function"){
 			formaturl = new URL(location);
+			console.log("Using URL() to process location");
 			// Some browsers implement URL() as webkitURL()
 			}else{
 			if (typeof(webkitURL) === "function"){
 			formaturl = new webkitURL(location);
+			console.info("Using webkitURL() instead of URL()");
 			// if the client doesn't support URL() or webkitURL(), disable partial file support
 			}else{
 			partial = false;
+			console.info("Disabling partial file support, browser does not support URL()");
 			}}
 			// Use partial file support if it's enabled
-			if(partial === true){ getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;}else{ getlocation = location; }
+			if(partial === true){
+			getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;
+			console.log("Fetching a partial HTML file");
+			}else{
+			getlocation = location;
+			console.log("Fetching a full HTML file");
+			}
 			// Actually send the request
+			console.log("Fetching " + getlocation);
 			xmlhttp.open("GET", getlocation, true);
 			// Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); // shushjax header, kept so you can see usage in server logs
@@ -306,7 +374,8 @@
 		opt.partial = false;
 		// Ensure a url and container have been provided.
 		if(typeof options.url === "undefined" || typeof options.container === "undefined"){
-			console.log("URL and Container must be provided.");
+			console.error("URL and Container must be provided.");
+			internal.triggerEvent(options.container, 'error');
 			return false;
 		}
 		// Find out if history has been provided
@@ -322,21 +391,25 @@
 		if(typeof options.parseLinksOnload === "undefined"){
 			options.parseLinksOnload = opt.parseLinksOnload;
 		}
+		console.log("parseLinksOnLoad is " + options.parseLinksOnload);
 		// Use partial file support? Disabled by default
 		if(typeof options.partial === "undefined"){
 			options.partial = opt.partial;
 		}
-		// Smart load (enabled by default.) Trys to ensure the correct HTML is loaded.
+		console.log("partial is " + options.partial);
+		// Smart load (enabled by default). Tries to ensure the correct HTML is loaded.
 		// If you are certain your backend will only return shushjax ready content this can be disabled
 		// for a slight perfomance boost.
 		if(typeof options.smartLoad === "undefined"){
 			options.smartLoad = opt.smartLoad;
 		}
+		console.log("smartLoad is " + options.smartLoad);
 		// Get container (if its an id, convert it to a dom node.)
 		if(typeof options.container === 'string' ) {
 			container = document.getElementById(options.container);
 			if(container === null){
-				console.log("Could not find container with id:"+options.container);
+				console.error("Could not find container with id:" + options.container);
+				internal.triggerEvent(options.container, 'error');
 				return false;
 			}
 			options.container = container;
@@ -344,15 +417,23 @@
 		// If everything went ok thus far, connect up listeners
 		if(typeof options.beforeSend === 'function'){
 			internal.addEvent(options.container, 'beforeSend', options.beforeSend);
+			console.log("shushjax request initiating");
 		}
 		if(typeof options.complete === 'function'){
 			internal.addEvent(options.container, 'complete', options.complete);
+			console.log("shushjax request complete");
 		}
 		if(typeof options.error === 'function'){
 			internal.addEvent(options.container, 'error', options.error);
+			console.error("An error occurred");
+		}
+		if(typeof options.requestError === 'function'){
+			internal.addEvent(options.container, 'requestError', options.requestError);
+			console.error("An error occurred during the shushjax request");
 		}
 		if(typeof options.success === 'function'){
 			internal.addEvent(options.container, 'success', options.success);
+			console.log("shushjax request completed successfully");
 		}
 		// Return valid options
 		return options;
@@ -423,12 +504,14 @@
 		// If shushjax isn't supported by the current browser, push user to specified page.
 		if(!internal.is_supported){
 			document.location = options.url;
+			console.info("Browser does not support shushjax. Pushing user directly to the specified page instead");
 			return;	
 		} 
 		// Proccess options
 		options = internal.parseOptions(options);
 		// If everything went ok, activate shushjax.
 		if(options !== false) internal.handle(options);
+		console.log("Everything is okay, activating shushjax");
 	};
 	var shushjax_obj = this;
         if (typeof define === 'function' && define.amd) {
