@@ -109,7 +109,7 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
 
                     <h3>Get started right</h3>
                     <p>
-                        Using shushjax dramatically alters the way that pages and resources are loaded on your website. If something is misconfigured, breakage could occur. Remember that <strong>when navigating to a new page with shushjax, only new resouces in the new container <code>&lt;div&gt;</code> will be loaded</strong>. All of the resources in other parts of the new page's HTML, such as CSS and javascript in the <code>&lt;head&gt;</code>, will not be loaded. All of the resouces outside of the container <code>&lt;div&gt;</code> must remain constant across all pages of a shushjax-enabled site. 
+                        Using shushjax dramatically alters the way that pages and resources are loaded on your website. If something is misconfigured, breakage could occur. Remember that <strong>when navigating to a new page with shushjax, only new resources in the new container <code>&lt;div&gt;</code> will be loaded</strong>. All of the resources in other parts of the new page's HTML, such as CSS and javascript in the <code>&lt;head&gt;</code>, will not be loaded. All of the resources outside of the container <code>&lt;div&gt;</code> must remain constant across all pages of a shushjax-enabled site. 
                     </p>
                     <h4>Debugging</h4>
                     <p>
@@ -121,7 +121,7 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                     </p>
                 </div>
                 <div class="l-box">
-                    <a href="#full_browsers"><h4 class="content-subhead hash_anchor" id="full_browsers">Compatability</h4></a>
+                    <a href="#full_browsers"><h4 class="content-subhead hash_anchor" id="full_browsers">Compatibility</h4></a>
 
                     <h3>Browser support</h3>
                     <p>
@@ -239,7 +239,7 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                     </p>
                     <h4>Using classes</h4>
                     <p>
-                            You can choose to only activate links with a specifc class with the <code>useClass</code> setting:
+                            You can choose to only activate links with a specific class with the <code>useClass</code> setting:
                             <pre><code>&lt;script&gt;shushjax.connect({container: 'content', useClass: 'shushjax-enabled',});&lt;/script&gt;</code></pre>
                     </p>
                 </div>
@@ -309,7 +309,7 @@ The callbacks are specified as part of the original shushjax.connect method:
 
                     <h3>Invoke shushjax yourself</h3>
                     <p>
-                        You can invoke a shushjax page load programmitcally by calling the shushjax.invoke() method. At minimum the invoke method must be given a url and container attribute. It can also be provided with a title, parseLinksOnload setting and any callbacks you wish to use. 
+                        You can invoke a shushjax page load programmatically by calling the shushjax.invoke() method. At minimum the invoke method must be given a url and container attribute. It can also be provided with a title, parseLinksOnload setting and any callbacks you wish to use. 
                         <pre><code>shushjax.invoke({url:'page1.php', container: 'content',});</code></pre>
                     </p>
                 </div>
