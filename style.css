@@ -76,7 +76,7 @@ body .primary-button {
 .content-head {
     color: #000;
 }
-h2 {
+h2, h2 a:link{
     color: #000;
 }
 /*.content a:link, .content a:visited, .content a:hover, .content a:active {
