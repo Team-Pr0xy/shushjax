@@ -76,7 +76,9 @@ body .primary-button {
 .content-head {
     color: #000;
 }
-
+h3 {
+    color: #000;
+}
 /*.content a:link, .content a:visited, .content a:hover, .content a:active {
     color: #999;
 }*/
