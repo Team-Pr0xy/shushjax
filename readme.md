@@ -45,7 +45,7 @@ Add links normally
 	
 Then specify which container they should use, via 
 
-	pjax.connect({container: 'content'});
+	shushjax.connect({container: 'content'});
 
 #### Option 3
 Set all links with a specific class to use a particular container using:
