@@ -6,6 +6,317 @@
  * @source https://github.com/Team-Pr0xy/shushjax
  * @license MIT
  */
+// BatchDom, based on FastDom by Wilson Page <wilsonpage@me.com> https://github.com/wilsonpage/fastdom
+// Eliminates layout thrashing by batching DOM read/write interactions.
+/* jshint bitwise:false */
+;(function(batchdom){
+  'use strict';
+  // Normalize rAF
+  var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || function(cb) { return window.setTimeout(cb, 1000 / 60); };
+  // Normalize cAF
+  var caf = window.cancelAnimationFrame || window.cancelRequestAnimationFrame || window.mozCancelAnimationFrame || window.mozCancelRequestAnimationFrame || window.webkitCancelAnimationFrame || window.webkitCancelRequestAnimationFrame || window.msCancelAnimationFrame || window.msCancelRequestAnimationFrame || function(id) { window.clearTimeout(id); };
+  /**
+   * Creates a fresh
+   * BatchDom instance.
+   *
+   * @constructor
+   */
+  function BatchDom() {
+    this.frames = [];
+    this.lastId = 0;
+    // Placing the rAF method
+    // on the instance allows
+    // us to replace it with
+    // a stub for testing.
+    this.raf = raf;
+    this.batch = {
+      hash: {},
+      read: [],
+      write: [],
+      mode: null
+    };
+  }
+  /**
+   * Adds a job to the read batch and schedules a new frame if need be.
+   * @param  {Function} fn
+   * @api public
+   */
+  BatchDom.prototype.read = function(fn, ctx) {
+    var job = this.add('read', fn, ctx);
+    var id = job.id;
+    // Add this job to the read queue
+    this.batch.read.push(job.id);
+    // We should *not* schedule a new frame if:
+    // 1. We're 'reading'
+    // 2. A frame is already scheduled
+    var doesntNeedFrame = this.batch.mode === 'reading' || this.batch.scheduled;
+    // If a frame isn't needed, return
+    if (doesntNeedFrame) return id;
+    // Schedule a new frame, then return
+    this.scheduleBatch();
+    return id;
+  };
+  /**
+   * Adds a job to the write batch and schedules a new frame if need be.
+   * @param  {Function} fn
+   * @api public
+   */
+  BatchDom.prototype.write = function(fn, ctx) {
+    var job = this.add('write', fn, ctx);
+    var mode = this.batch.mode;
+    var id = job.id;
+    // Push the job id into the queue
+    this.batch.write.push(job.id);
+    // We should *not* schedule a new frame if:
+    // 1. We are 'writing'
+    // 2. We are 'reading'
+    // 3. A frame is already scheduled.
+    var doesntNeedFrame = mode === 'writing' || mode === 'reading' || this.batch.scheduled;
+    // If a frame isn't needed, return
+    if (doesntNeedFrame) return id;
+    // Schedule a new frame, then return
+    this.scheduleBatch();
+    return id;
+  };
+  /**
+   * Adds a console.log() job to the write batch
+   * @param {logged text}
+   * @api public
+   */
+  BatchDom.prototype.writelog = function(logtext){
+    var self = this;
+    return this.write(function(){
+    (console.log(logtext));
+    });
+  };
+  /**
+   * Adds a console.info() job to the write batch
+   * @param {logged text}
+   * @api public
+   */
+  BatchDom.prototype.writeinfo = function(logtext){
+    var self = this;
+    return this.write(function(){
+    (console.info(logtext));
+    });
+  };
+  /**
+   * Adds a console.error() job to the write batch
+   * @param {logged text}
+   * @api public
+   */
+  BatchDom.prototype.writeerror = function(logtext){
+    var self = this;
+    return this.write(function(){
+    (console.error(logtext));
+    });
+  };
+  /**
+   * Defers the given job by the number of frames specified.
+   * If no frames are given then the job is run in the next free frame.
+   * @param  {Number}   frame
+   * @param  {Function} fn
+   * @api public
+   */
+  BatchDom.prototype.defer = function(frame, fn, ctx) {
+    // Accepts two arguments
+    if (typeof frame === 'function') {
+      ctx = fn;
+      fn = frame;
+      frame = 1;
+    }
+    var self = this;
+    var index = frame - 1;
+    return this.schedule(index, function() {
+      self.run({
+        fn: fn,
+        ctx: ctx
+      });
+    });
+  };
+  /**
+   * Clears a scheduled 'read', 'write' or 'defer' job.
+   * @param  {Number} id
+   * @api public
+   */
+  BatchDom.prototype.clear = function(id) {
+    // Defer jobs are cleared differently
+    if (typeof id === 'function') {
+      return this.clearFrame(id);
+    }
+    var job = this.batch.hash[id];
+    if (!job) return;
+    var list = this.batch[job.type];
+    var index = list.indexOf(id);
+    // Clear references
+    delete this.batch.hash[id];
+    if (~index) list.splice(index, 1);
+  };
+  /**
+   * Clears a scheduled frame.
+   * @param  {Function} frame
+   * @api private
+   */
+  BatchDom.prototype.clearFrame = function(frame) {
+    var index = this.frames.indexOf(frame);
+    if (~index) this.frames.splice(index, 1);
+  };
+  /**
+   * Schedules a new read/write batch if one isn't pending.
+   * @api private
+   */
+  BatchDom.prototype.scheduleBatch = function() {
+    var self = this;
+    // Schedule batch for next frame
+    this.schedule(0, function() {
+      self.batch.scheduled = false;
+      self.runBatch();
+    });
+    // Set flag to indicate a frame has been scheduled
+    this.batch.scheduled = true;
+  };
+  /**
+   * Generates a unique id for a job.
+   * @return {Number}
+   * @api private
+   */
+  BatchDom.prototype.uniqueId = function() {
+    return ++this.lastId;
+  };
+  /**
+   * Calls each job in the list passed.
+   * If a context has been stored on the function then it is used, else the current `this` is used.
+   * @param  {Array} list
+   * @api private
+   */
+  BatchDom.prototype.flush = function(list) {
+    var id;
+    while (!!(id = list.shift())) {
+      this.run(this.batch.hash[id]);
+    }
+  };
+  /**
+   * Runs any 'read' jobs followed by any 'write' jobs.
+   * We run this inside a try catch so that if any jobs error, we are able to recover and continue to flush the batch until it's empty.
+   * @api private
+   */
+  BatchDom.prototype.runBatch = function() {
+    try {
+      // Set the mode to 'reading',
+      // then empty all read jobs
+      this.batch.mode = 'reading';
+      this.flush(this.batch.read);
+      // Set the mode to 'writing'
+      // then empty all write jobs
+      this.batch.mode = 'writing';
+      this.flush(this.batch.write);
+      this.batch.mode = null;
+    } catch (e) {
+      this.runBatch();
+      throw e;
+    }
+  };
+  /**
+   * Adds a new job to the given batch.
+   * @param {Array}   list
+   * @param {Function} fn
+   * @param {Object}   ctx
+   * @returns {Number} id
+   * @api private
+   */
+  BatchDom.prototype.add = function(type, fn, ctx) {
+    var id = this.uniqueId();
+    var result = this.batch.hash[id] = {
+      id: id,
+      fn: fn,
+      ctx: ctx,
+      type: type
+    };
+    return result;
+  };
+  /**
+   * Runs a given job.
+   * Applications using BatchDom have the options of setting `batchdom.onError`.
+   * This will catch any errors that may throw inside callbacks, which
+   * is useful as often DOM nodes have been removed since a job was scheduled.
+   *
+   * Example:
+   *   batchdom.onError = function(e) {
+   *     // Runs when jobs error
+   *   };
+   * @param  {Object} job
+   * @api private
+   */
+  BatchDom.prototype.run = function(job){
+    var ctx = job.ctx || this;
+    var fn = job.fn;
+    // Clear reference to the job
+    delete this.batch.hash[job.id];
+    // If no `onError` handler has been registered, just run the job normally.
+    if (!this.onError) {
+      return fn.call(ctx);
+    }
+    // If an `onError` handler has been registered, catch errors that throw inside
+    // callbacks, and run the handler instead.
+    try { fn.call(ctx); } catch (e) {
+      this.onError(e);
+    }
+  };
+  /**
+   * Starts a rAF loop to empty the frame queue.
+   * @api private
+   */
+  BatchDom.prototype.loop = function() {
+    var self = this;
+    var raf = this.raf;
+    // Don't start more than one loop
+    if (this.looping) return;
+    raf(function frame() {
+      var fn = self.frames.shift();
+      // If no more frames, stop looping
+      if (!self.frames.length) {
+        self.looping = false;
+      // Otherwise, schedule the next frame
+      } else {
+        raf(frame);
+      }
+      // Run the frame.  Note that this may throw an error in user code, but all batchdom tasks are dealt
+      // with already so the code will continue to iterate
+      if (fn) fn();
+    });
+    this.looping = true;
+  };
+  /**
+   * Adds a function to a specified index of the frame queue. 
+   * @param  {Number}   index
+   * @param  {Function} fn
+   * @return {Function}
+   */
+  BatchDom.prototype.schedule = function(index, fn) {
+    // Make sure this slot hasn't already been taken. If it has, try re-scheduling for the next slot
+    if (this.frames[index]) {
+      return this.schedule(index + 1, fn);
+    }
+    // Start the rAF loop to empty the frame queue
+    this.loop();
+    // Insert this function into the frames queue and return
+    var result = this.frames[index] = fn;
+    return result;
+  };
+  // We only ever want there to be one instance of BatchDom in an app
+  batchdom = batchdom || new BatchDom();
+  /**
+   * Expose 'batchdom'
+   */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = batchdom;
+  } else if (typeof define === 'function' && define.amd) {
+    define(function(){ return batchdom; });
+  } else {
+    window.batchdom = batchdom;
+  }
+})(window.batchdom);
+// Start of shushjax
 (function(){
 	// Object to store private values/methods.
 	var internal = {
@@ -25,12 +336,12 @@
 	internal.addEvent = function(obj, event, callback){
 		if(window.addEventListener){
 				// Browsers that don't suck
-				console.log("Adding event listener to " + obj + " on event " + event);
+				batchdom.writelog("Adding event listener to " + obj + " on event " + event);
 				obj.addEventListener(event, callback, false);
 		}else{
 				// IE8/7
-				console.info("Adding fallback event listeners for old IE versions");
-				console.log("Adding event listener to " + obj + " on event " + event);
+				batchdom.writeinfo("Adding fallback event listeners for old IE versions");
+				batchdom.writelog("Adding event listener to " + obj + " on event " + event);
 				obj.attachEvent('on'+event, callback);
 		}
 	};
@@ -70,9 +381,9 @@
 		evt = document.createEventObject();
 		evt.eventType = 'on'+ event_name;
 		node.fireEvent(evt.eventType, evt);
-		console.info("Using createEvent fallbacks for old IE versions");
+		batchdom.writeinfo("Using createEvent fallbacks for old IE versions");
 		}
-		console.log("Firing event " + event_name);
+		batchdom.writelog("Firing event " + event_name);
 	};
 	/**
 	 * popstate listener
@@ -96,13 +407,13 @@
                         var options = internal.parseOptions(opt);
 			// If somthing went wrong, return.
 			if(options === false){
-			console.error("Failed to read state data " + st);
+			batchdom.writeerror("Failed to read state data " + st);
 			internal.triggerEvent(options.container,'generalError');
 			return;
 			}
 			// If there is a state object, handle it as a page load.
 			internal.handle(options);
-			console.log("Handling state " + st);
+			batchdom.writelog("Handling state " + st);
 		}
 	});
 	/**
@@ -115,18 +426,18 @@
 	internal.attach = function(node, options){
 		// if no pushstate support, dont attach and let stuff work as normal.
 		if(!internal.is_supported){
-		console.info("No pushstate support in browser, shushjax is disabled");
+		batchdom.writeinfo("No pushstate support in browser, shushjax is disabled");
 		return;
 		}
 		// Ignore external links.
 		if ( node.protocol !== document.location.protocol ||
 			node.host !== document.location.host ){
-			console.log("Ignoring external anchor " + node.href);
+			batchdom.writelog("Ignoring external anchor " + node.href);
 			return;
 		}
 		// Ignore anchors on the same page
                 if(node.pathname === location.pathname && node.hash.length > 0) {
-                        console.log("Ignoring same-page anchor " + node.hash);
+                        batchdom.writelog("Ignoring same-page anchor " + node.hash);
                         return true;
                  }
 		// Add link href to object
@@ -134,17 +445,17 @@
 		// If data-shushjax is specified, use as container
 		if(node.getAttribute('data-shushjax')){
 			options.container = node.getAttribute('data-shushjax');
-			console.log("Using " + options.container + " as container for " + node.href + " as specified with data-shushjax");
+			batchdom.writelog("Using " + options.container + " as container for " + node.href + " as specified with data-shushjax");
 		}
 		// If data-title is specified, use as title.
 		if(node.getAttribute('data-title')){
 			options.title = node.getAttribute('data-title');
-			console.log("Using " + options.title + " as title for " + node.href + " as specified with data-title");
+			batchdom.writelog("Using " + options.title + " as title for " + node.href + " as specified with data-title");
 		}
 		// Check options are valid.
 		options = internal.parseOptions(options);
 		if(options === false){
-                        console.error("Invalid options error");
+                        batchdom.writeerror("Invalid options error");
                         internal.triggerEvent(options.container,'generalError');
 		return;
 		}
@@ -156,7 +467,7 @@
 			if(event.preventDefault){event.preventDefault();}else{event.returnValue = false;}
 			// Take no action if we are already on said page?
 			if(document.location.href === options.url){
-			console.log("Ignoring same-page anchor " + options.url);
+			batchdom.writelog("Ignoring same-page anchor " + options.url);
 			return false;
 			}
 			// handle the load.
@@ -174,10 +485,10 @@
 		if(typeof options.useClass !== "undefined"){
 			// Get all nodes with the provided classname.
 			nodes = dom_obj.getElementsByClassName(options.useClass);
-			console.log("Attaching to links with class " + options.useClass);
+			batchdom.writelog("Attaching to links with class " + options.useClass);
 		}else{  // If no class was provided, just get all the links
 			nodes = dom_obj.getElementsByTagName('a');
-			console.log("Attaching to all links, useClass is unspecified");
+			batchdom.writelog("Attaching to all links, useClass is unspecified");
 		}
 		// For all returned nodes
 		for(var i=0,tmp_opt; i < nodes.length; i++){
@@ -206,7 +517,7 @@
 		// Grab the title if there is one (maintain IE7 compatability)
 		var title = tmp.getElementsByTagName('title')[0].innerHTML;
 		if(title){
-		console.log("Using returned document title: " + title);
+		batchdom.writelog("Using returned document title: " + title);
 		document.title = title;
 		}
 		//Look through all returned divs.
@@ -217,10 +528,10 @@
 				// not partial pages ready, but instead likely the full HTML content. In addition we can also guess that
 				// the content of this node is what we want to update our container with.
 				// Thus use this content as the HTML to append in to our page via shushjax.
-				console.info("Found container div in the returned HTML, treating as full HTML content and processing with smartLoad");
+				batchdom.writeinfo("Found container div in the returned HTML, treating as full HTML content and processing with smartLoad");
 				// break;
 				return tmpNodes[i].innerHTML;
-			}else console.log("Didn't find container div in the returned HTML, processing as a partial page");
+			}else batchdom.writelog("Didn't find container div in the returned HTML, processing as a partial page");
 		}
 		// If our container was not found, HTML will be returned as is.
 		return html;
@@ -243,12 +554,12 @@
 				return;
 			}
 			// Ensure we have the correct HTML to apply to our container.
-			console.log("smartLoad is " + options.smartLoad);
+			batchdom.writelog("smartLoad is " + options.smartLoad);
 			if(options.smartLoad) html = internal.smartLoad(html, options);
 			// Update the dom with the new content
 			options.container.innerHTML = html;
 			// Initalise any links found within document (if enabled).
-			console.log("parseLinksOnLoad is " + options.parseLinksOnload);
+			batchdom.writelog("parseLinksOnLoad is " + options.parseLinksOnload);
 			if(options.parseLinksOnload){
 				internal.parseLinks(options.container, options);
 			}
@@ -259,7 +570,6 @@
 					options.title = options.container.getElementsByTagName('title')[0].innerHTML;
 				}else{
 					options.title = document.title;
-					console.log("No title was provided");
 				}
 			}
 			// Do we need to add this to the history?
@@ -276,7 +586,7 @@
 			internal.triggerEvent(options.container,'complete');
 			if (xmlhttp.status !== 200){ // Got a page with an error
                                 internal.triggerEvent(options.container,'requestError');
-                                console.error("Request finished with HTTP error " + xmlhttp.status);
+                                batchdom.writeerror("Request finished with HTTP error " + xmlhttp.status);
                                 return;
 			}
 			if(html === false || html === "undefined"){ // Somthing went wrong
@@ -287,7 +597,7 @@
 			}
 			// If Google analytics is detected push a trackPageView, so shushjax pages can be tracked successfully.
 			if(window._gaq){
-			console.log("Pushing Google Analytics pageview");
+			batchdom.writelog("Pushing Google Analytics pageview");
 			_gaq.push(['_trackPageview']);
 			}
 			// Set new title
@@ -303,39 +613,39 @@
 	 * @param callback. Method to call when a page is loaded.
 	 */
 	internal.request = function(location, partial, callback){
-		console.log("Requesting page " + location);
+		batchdom.writelog("Requesting page " + location);
 		// Create xmlHttpRequest object.
 		xmlhttp = window.XMLHttpRequest?new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
 			// Check if the browser supports XHR2
 			if (typeof xmlhttp.onload !== "undefined"){
-			console.log("Using XHR2");
+			batchdom.writelog("Using XHR2");
 			xmlhttp.onloadend = function(){ // Finished load
-			console.log("Fetch complete, HTTP status code " + xmlhttp.status);
+			batchdom.writelog("Fetch complete, HTTP status code " + xmlhttp.status);
 			if (xmlhttp.status !== 200){
 			}
 			callback(xmlhttp.responseText, xmlhttp.status); // Success, Return HTML
 			};
 			xmlhttp.onerror = function(){ // Error during loading
 			if (xmlhttp.status === 0){
-			console.error("Failed to connect to the server, network error " + xmlhttp.status);
+			batchdom.writeerror("Failed to connect to the server, network error " + xmlhttp.status);
 			}else{
-			console.error("Fetch error, HTTP status code " + xmlhttp.status);
+			batchdom.writeerror("Fetch error, HTTP status code " + xmlhttp.status);
 			}
 			// return error page if present
 			callback(xmlhttp.responseText, xmlhttp.status);
 			return false; // Failure, return false
 			};
 			}else{ // old browsers that don't support XHR2
-			console.info("Falling back to basic XHR");
+			batchdom.writeinfo("Falling back to basic XHR");
 			// Add the old state listener
 			xmlhttp.onreadystatechange = function(){
 				if ((xmlhttp.readyState === 4) && (xmlhttp.status === 200)) {
 					// Success, Return html
 					callback(xmlhttp.responseText);
-					console.log("Fetch complete");
+					batchdom.writelog("Fetch complete");
 				}else if((xmlhttp.readyState === 4) && (xmlhttp.status !== 200)){
 					// error, return error page if present
-					console.error("Fetch error, HTTP status code " + xmlhttp.status);
+					batchdom.writeerror("Fetch error, HTTP status code " + xmlhttp.status);
 					callback(xmlhttp.responseText);
 					return false;} // Failure, return false
 				};
@@ -344,27 +654,27 @@
 			// Check for browser support of URL()
 			if (typeof(URL) === "function"){
 			formaturl = new URL(location);
-			console.log("Using URL() to process location");
+			batchdom.writelog("Using URL() to process location");
 			// Some browsers implement URL() as webkitURL()
 			}else{
 			if (typeof(webkitURL) === "function"){
 			formaturl = new webkitURL(location);
-			console.info("Using webkitURL() instead of URL()");
+			batchdom.writeinfo("Using webkitURL() instead of URL()");
 			// if the client doesn't support URL() or webkitURL(), disable partial file support
 			}else{
 			partial = false;
-			console.info("Disabling partial file support, browser does not support URL()");
+			batchdom.writeinfo("Disabling partial file support, browser does not support URL()");
 			}}
 			// Use partial file support if it's enabled
 			if(partial === true){
 			getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;
-			console.log("Fetching a partial HTML file");
+			batchdom.writelog("Fetching a partial HTML file");
 			}else{
 			getlocation = location;
-			console.log("Fetching a full HTML file");
+			batchdom.writelog("Fetching a full HTML file");
 			}
 			// Actually send the request
-			console.log("Fetching " + getlocation);
+			batchdom.writelog("Fetching " + getlocation);
 			xmlhttp.open("GET", getlocation, true);
 			// Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); // shushjax header, kept so you can see usage in server logs
@@ -387,7 +697,7 @@
 		opt.partial = false;
 		// Ensure a url and container have been provided.
 		if(typeof options.url === "undefined" || typeof options.container === "undefined"){
-			console.error("URL and Container must be provided");
+			batchdom.writeerror("URL and Container must be provided");
 			internal.triggerEvent(options.container,'generalError');
 			return false;
 		}
@@ -418,7 +728,7 @@
 		if(typeof options.container === 'string' ) {
 			container = document.getElementById(options.container);
 			if(container === null){
-				console.error("Could not find container with id:" + options.container);
+				batchdom.writeerror("Could not find container with id:" + options.container);
 				internal.triggerEvent(options.container,'generalError');
 				return false;
 			}
@@ -427,23 +737,23 @@
 		// If everything went ok thus far, connect up listeners
 		if(typeof options.beforeSend === 'function'){
 			internal.addEvent(options.container, 'beforeSend', options.beforeSend);
-			console.log("shushjax request initiating");
+			batchdom.writelog("shushjax request initiating");
 		}
 		if(typeof options.complete === 'function'){
 			internal.addEvent(options.container, 'complete', options.complete);
-			console.log("shushjax request complete");
+			batchdom.writelog("shushjax request complete");
 		}
 		if(typeof options.generalError === 'function'){
 			internal.addEvent(options.container, 'generalError', options.generalError);
-			console.error("An error occurred");
+			batchdom.writeerror("An error occurred");
 		}
 		if(typeof options.requestError === 'function'){
 			internal.addEvent(options.container, 'requestError', options.requestError);
-			console.error("An error occurred during the shushjax request");
+			batchdom.writeerror("An error occurred during the shushjax request");
 		}
 		if(typeof options.success === 'function'){
 			internal.addEvent(options.container, 'success', options.success);
-			console.log("shushjax request completed successfully");
+			batchdom.writelog("shushjax request completed successfully");
 		}
 		// Return valid options
 		return options;
@@ -514,14 +824,14 @@
 		// If shushjax isn't supported by the current browser, push user to specified page.
 		if(!internal.is_supported){
 			document.location = options.url;
-			console.info("Browser does not support shushjax. Pushing user directly to the specified page instead");
+			batchdom.writeinfo("Browser does not support shushjax. Pushing user directly to the specified page instead");
 			return;	
 		} 
 		// Proccess options
 		options = internal.parseOptions(options);
 		// If everything went ok, activate shushjax.
 		if(options !== false) internal.handle(options);
-		console.log("Everything is okay, activating shushjax");
+		batchdom.writelog("Everything is okay, activating shushjax");
 	};
 	var shushjax_obj = this;
         if (typeof define === 'function' && define.amd) {
