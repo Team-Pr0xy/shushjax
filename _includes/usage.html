@@ -110,6 +110,16 @@ shushjax will only replace content that you configure.
                     <h3>Browser support</h3>
                     <p>
                     Nearly all browsers behave as expected with shushjax, and the vast majority are able to use the performance benefits. shushjax is designed with a series of graceful fallbacks. When a browser doesn't support part of shushjax, the code disables itself and pages load normally. 
+                    <h4>Fallbacks</h4>
+                    <p>
+                    <ul>
+                            <li><strong>No Javascript</strong> links load normally, shushjax doesn't activate</li>
+                            <li><strong>No pushState</strong> links load normally, shushjax pushes the browser to it directly</li>
+                            <li><strong>No URL()</strong> partial file support is disabled, whole HTML files are loaded instead</li>
+                            <li><strong>No XHR2</strong> the classic XMLHttpRequest is used instead</li>
+                    </ul>
+                    These fallbacks enable shushjax to <strong>consistently</strong> deliver a fast, working browsing experience with real permalinks, page titles, and a working back button, no matter the browser. 
+                    </p>
                     <h4>Support table</h4>
                     Note that the entries in this table are estimates, as shushjax has not yet been extensively tested
                     <table class="pure-table pure-table-bordered">
