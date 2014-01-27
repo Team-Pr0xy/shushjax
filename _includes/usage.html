@@ -220,18 +220,14 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                     <h4>Insert a link to shushjax in your <code>&lt;head&gt;</code></h4>
                     <p>
                         No matter how you use shushjax, you'll need to place the script on your webserver, then add a link in the <code>&lt;head&gt;</code> of your html:
-<pre><code>
-&lt;script src=&quot;/shushjax.min.js&quot;&gt;&lt;/script&gt;
-</code></pre>
+<pre><code>&lt;script src=&quot;/shushjax.min.js&quot;&gt;&lt;/script&gt;</code></pre>
                     </p>
                     <p><h4><button class="pure-button pure-button-note">Note</button> Serve minified and gzipped for maximum performance</h4></p>
                     <p><h4><button class="pure-button pure-button-primary">CDN</button> Coming Soon: Use a CDN</h4></p>
                     <h4>Tell shushjax what content to load</h4>
                     <p>
                         shushjax will only replace content that you configure. You'll need a 'container' <code>&lt;div&gt;</code> on each page, which is where shushjax will insert content from new pages. Immediately below the link to the shushjax javascript file, initialize shushjax and specify options. 
-<pre><code>
-&lt;script&gt;shushjax.connect();&lt;/script&gt;
-</code></pre>
+<pre><code>&lt;script&gt;shushjax.connect();&lt;/script&gt;</code></pre>
                         When enabling shushjax, you can choose to activate on all normal links or just links with a special class. You can also specify either one container for all loaded content or use special settings on individual links. 
                     </p>
                     <h4>The container</h4>
@@ -256,17 +252,18 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                     <pre><code>&lt;script&gt;shushjax.connect({options});&lt;/script&gt;</code></pre>
                     <ul>
                         <li><strong>container</strong> <em>string</em> The <code>&lt;div&gt;</code> where freshly loaded content gets inserted</li>
+                        <pre><code>container: 'content',</code></pre>
                         <li><strong>smartLoad</strong> <em>true|false</em> Ensure that the returned HTML is usable. Enabled by default. You can disable this for a slight performance boost if you are absolutely sure that the returned HTML is a properly formatted partial file. It's suggested that you keep this enabled so that shushjax can automatically work around problems with the returned page. 
-                            <pre><code>'smartLoad': true,</code></pre>
+                            <pre><code>smartLoad: true,</code></pre>
                         </li>
                         <li><strong>useClass</strong> <em>string</em> Only activate shushjax on links with the provided class. Using this can make implementing shushjax easier on complex sites. 
-                            <pre><code>'useClass': 'shushjax-enabled',</code></pre>
+                            <pre><code>useClass: 'shushjax-enabled',</code></pre>
                         </li>
                         <li><strong>partial</strong> <em>true|false</em> Use partial file support. Disabled by default. When enabled, shushjax will load pages using partial files located under the /partials directory. 
-                            <pre><code>'partial': true,</code></pre>
+                            <pre><code>partial: true,</code></pre>
                         </li>
                         <li><strong>parseLinksOnload</strong> <em>true|false</em> Make links on loaded pages use shushjax. Enabled by default. 
-                            <pre><code>'parseLinksOnload': true,</code></pre>
+                            <pre><code>parseLinksOnload: true,</code></pre>
                         </li>
                     </ul>
                     </p>
@@ -294,9 +291,9 @@ shushjax will only replace content that you configure.
 </ul>
 The callbacks are specified as part of the original shushjax.connect method:
 <pre><code>shushjax.connect({
-    'container': 'content',
-    'beforeSend': function(){console.log("before send");},
-    'complete': function(){console.log("done!");},
+    container: 'content',
+    beforeSend: function(){console.log("before send");},
+    complete: function(){console.log("done!");},
 });</code></pre>
                     </p>
                 </div>
