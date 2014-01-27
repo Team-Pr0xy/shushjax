@@ -99,17 +99,25 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                 <div class="l-box">
                     <a href="#full_core"><h4 class="content-subhead hash_anchor" id="full_core">Core Concepts</h4></a>
 
-                    <h3>Tell shushjax what content to load</h3>
+                    <h3>It's just ajax and pushState</h3>
                     <p>
-shushjax will only replace content that you configure. 
+                        shushjax is designed to make your pages load crazy fast by only loading new content and injecting it into the current CSS and layout. shushjax uses ajax and pushState to deliver a fast browsing experience with real permalinks, page titles, and a working back button. shushjax works by grabbing html from your server via ajax and replacing the content of a container on your page with the ajax'd html. It then updates the browser's current url using pushState without reloading your page's layout or any resources (js, css, fonts), giving the appearance of a fast, full page load. While AJAX-driven webapps have been around for years using some frameworks, implementing them has been complicated. By contrast, shushjax is designed as a simple drop-in solution. 
                     </p>
                 </div>
                 <div class="l-box">
                     <a href="#full_caveats"><h4 class="content-subhead hash_anchor" id="full_caveats">Caveats</h4></a>
 
-                    <h3>Tell shushjax what content to load</h3>
+                    <h3>Get started right</h3>
                     <p>
-shushjax will only replace content that you configure. 
+                        Using shushjax dramatically alters the way that pages and resources are loaded on your website. If something is misconfigured, breakage could occur. Remember that <strong>when navigating to a new page with shushjax, only new resouces in the new container <code>&lt;div&gt;</code> will be loaded</strong>. All of the resources in other parts of the new page's HTML, such as CSS and javascript in the <code>&lt;head&gt;</code>, will not be loaded. All of the resouces outside of the container <code>&lt;div&gt;</code> must remain constant across all pages of a shushjax-enabled site. 
+                    </p>
+                    <h4>Debugging</h4>
+                    <p>
+                            shushjax automatically delivers verbose logs of everything it does to your browser's javascript console. You can see which links it does and does not activate on, as well as the page loading process and fired events. 
+                    </p>
+                    <h4>Other rules</h4>
+                    <p>
+                            When processing the links on a page, shushjax will only activate itself on links that point to <strong>exactly</strong> the same host. The URL scheme, hostname, and port must be the same as the current page, otherwise the link will load regularly. 
                     </p>
                 </div>
                 <div class="l-box">
