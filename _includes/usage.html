@@ -86,11 +86,13 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                     <!--<div class="l-box ribbon"><h4><button class="pure-button pure-button-error"><i class="fa fa-exclamation-triangle"></i> Warning</button></h4><h4> Using partial file support is not recommended at this time because it <a href="https://github.com/Team-Pr0xy/shushjax/issues/12">can make some browsers fail to load content</a>. </h4></div>-->
                     <p>
                         For even faster performance, deliver partial pages to shushjax. Partial pages contain only the contents of the container div, saving bandwidth. <br>When partial page support is enabled, shushjax looks for partial pages under the <code>/partials</code> directory. For example, if the original page is located at
-                        <pre><code>http%3A%2F%2Fexample.com%2Foceans%2Fpacific.html</code></pre>
+                        <pre><code>http://example.com/oceans/pacific.html</code></pre>
                         shushjax will look for the partial version at
-                        <pre><code>http%3A%2F%2Fexample.com%2Fpartials%2Foceans%2Fpacific.html</code></pre>
+                        <pre><code>http://example.com/partials/oceans/pacific.html</code></pre>
                         Once you've set up the files on your server, enable partial pages in your <code>shushjax.connect</code>
                         <pre><code>&lt;script&gt;shushjax.connect({'container': 'content', 'partial': true,});&lt;/script&gt;</code></pre>
+                        <h4><button class="pure-button pure-button-note">Note</button> Keep your original files</h4>
+                        The original files will still be used the first time that a browser loads a page on your site and are also used by any clients, such as search engines, that are incompatable with shushjax. 
                     </p>
                 </div>
                 <a href="#full" class="content-head"><h2 id="full" class="hash_anchor">Full Documentation</h2></a>
