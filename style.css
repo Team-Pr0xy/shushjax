@@ -32,7 +32,10 @@ body .primary-button {
     background: #02a6eb;
     color: #fff;
 }
-
+.pure-button-note {
+    background: #333333;
+    color: #fff;
+}
 .link a:link, .link a:visited, .link a:hover, .link a:active {
     color: #343491;
 }
@@ -141,17 +144,6 @@ td.broken{
 .fa-10x {
   font-size: 10em;
 }
-.fa-11x {
-  font-size: 11em;
-}
-.fa-12x {
-  font-size: 12em;
-}
-.fa-13x {
-  font-size: 13em;
-}
-.fa-14x {
-  font-size: 14em;
 }
 .fa-15x {
   font-size: 15em;
