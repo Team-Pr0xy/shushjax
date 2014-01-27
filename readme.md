@@ -1,7 +1,7 @@
 # shushjax #
 
 [![Code Climate](https://codeclimate.com/github/Team-Pr0xy/shushjax.png)](https://codeclimate.com/github/Team-Pr0xy/shushjax)  [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/Team-Pr0xy/shushjax/badges/quality-score.png?s=1a51e1f05b984d9558b93c872d7b3045f0a2ec58)](https://scrutinizer-ci.com/g/Team-Pr0xy/shushjax/)  
-Standalone (no jQuery) Headerless pUSHstate + aJAX. Makes your pages load crazy fast by only loading the new content and injecting it into the current CSS and layout. Doesn't require special backends or other plugins like jQuery. shushjax uses ajax and pushState to deliver a fast browsing experience with real permalinks, page titles, and a working back button. shushjax works by grabbing html from your server via ajax and replacing the content of a container on your page with the ajax'd html. It then updates the browser's current url using pushState without reloading your page's layout or any resources (js, css), giving the appearance of a fast, full page load. But really it's just ajax and pushState. Inspired by the [original PJAX](https://github.com/defunkt/jquery-pjax), forked from [PJAX-Standalone](https://github.com/thybag/PJAX-Standalone) and with pjax-fw ported over. It's about 3kb minified + gzipped. This code is licensed under the MIT License. For [browsers that don't support pushState](http://caniuse.com/#search=pushstate), or any of the other features it requires, shushjax gracefully degrades.  
+Standalone (no jQuery) Headerless pUSHstate + aJAX. Makes your pages load crazy fast by only loading the new content and injecting it into the current CSS and layout. Doesn't require special backends or other plugins like jQuery. shushjax uses ajax and pushState to deliver a fast browsing experience with real permalinks, page titles, and a working back button. shushjax works by grabbing html from your server via ajax and replacing the content of a container on your page with the ajax'd html. It then updates the browser's current url using pushState without reloading your page's layout or any resources (js, css), giving the appearance of a fast, full page load. But really it's just ajax and pushState. Inspired by the [original PJAX](https://github.com/defunkt/jquery-pjax), forked from [PJAX-Standalone](https://github.com/thybag/PJAX-Standalone) and with pjax-fw ported over. It's about 4kb minified + gzipped. This code is licensed under the MIT License. For [browsers that don't support pushState](http://caniuse.com/#search=pushstate), or any of the other features it requires, shushjax gracefully degrades.  
 
 Documentation: http://shushjax.teampr0xy.net  
 By JC Hulce: http://www.jchulce.com
@@ -19,7 +19,7 @@ Compared to the original PJAX, shushjax offers additional flexibility, performan
 * No server header or special backend requirements means that shushjax can be used on static hosts and CDNs like GitHub pages and S3
 * No jQuery required means that the browser does not need to load and process tens of kilobytes of unused javascript, increasing performance
 
-## Compatability ##
+## Compatibility ##
 This code should work in in Chrome, Firefox, Opera, Safari, Android, iOS, and IE7,8, 9, and 10+. 
 shushjax is supported in Chrome, Firefox, Safari, Android, iOS, and Opera, while in old IE the fallbacks operate.
 
@@ -30,7 +30,7 @@ To add shushjax to your page, you will need to include the shushjax.js script in
 Once done, shushjax can be setup in 3 ways. 
 
 #### Option 1
-Give all links a data-shushjax attribute specifing where to place the content that gets loaded.:
+Give all links a data-shushjax attribute specifying where to place the content that gets loaded.:
 
     <a href='page1.php' data-shushjax='content'>Page 1</a>
 
@@ -85,7 +85,7 @@ In addition to the callbacks the following options can also be provided to shush
 
 ### Using shushjax programmatically
 
-You can invoke a shushjax page load programmitcally by calling the shushjax.invoke() method.
+You can invoke a shushjax page load programmatically by calling the shushjax.invoke() method.
 At minimum the invoke method must be given a url and container attribute. It can also
 be provided with a title, parseLinksOnload setting and any callbacks you wish to use.
 
