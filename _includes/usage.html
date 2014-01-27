@@ -231,12 +231,13 @@ shushjax will only replace content that you configure.
 
                     <h3>Available callbacks</h3>
                     <p>
-                    shushjax impliments the following callbacks:
+                    shushjax implements the following callbacks:
 <ul>
 <li>beforeSend - Called before ajax request is made</li>
 <li>complete - When ajax request has completed</li>
 <li>success - When ajax request has completed successfully</li>
-<li>error - When ajax request did not complete successfully (error 500, etc)</li>
+<li>requestError - When ajax request did not complete successfully (error 500, etc)</li>
+<li>generalError - When a problem occurs elsewhere, like parsing the document</li>
 </ul>
 The callbacks are specified as part of the original shushjax.connect method:
 <pre><code>shushjax.connect({
