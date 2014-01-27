@@ -238,8 +238,7 @@
 		internal.triggerEvent(options.container, 'beforeSend');
 		// Do the request
 		internal.request(options.url, options.partial, function(html){
-                        // If no HTML was provided
-                        if(html === false || html === "undefined"){ //Somthing went wrong
+                        if (! html ){
 				internal.triggerEvent(options.container,'requestError');
 				return;
 			}
@@ -275,8 +274,13 @@
 			}
 			// Fire Events
 			internal.triggerEvent(options.container,'complete');
-			if(html === false || html === "undefined"){ //Somthing went wrong
-				internal.triggerEvent(options.container,'generalError');
+			if (xmlhttp.status !== 200){ // Got a page with an error
+                                internal.triggerEvent(options.container,'requestError');
+                                console.error("Request finished with HTTP error " + xmlhttp.status);
+                                return;
+			}
+			if(html === false || html === "undefined"){ // Somthing went wrong
+				internal.triggerEvent(options.container,'requestError');
 				return;
 			}else{ //got what we expected.
 				internal.triggerEvent(options.container,'success');
@@ -305,9 +309,11 @@
 			// Check if the browser supports XHR2
 			if (typeof xmlhttp.onload !== "undefined"){
 			console.log("Using XHR2");
-			xmlhttp.onload = function(){ // Successful load
+			xmlhttp.onloadend = function(){ // Finished load
 			console.log("Fetch complete, HTTP status code " + xmlhttp.status);
-			callback(xmlhttp.responseText); // Success, Return HTML
+			if (xmlhttp.status !== 200){
+			}
+			callback(xmlhttp.responseText, xmlhttp.status); // Success, Return HTML
 			};
 			xmlhttp.onerror = function(){ // Error during loading
 			if (xmlhttp.status === 0){
@@ -316,7 +322,7 @@
 			console.error("Fetch error, HTTP status code " + xmlhttp.status);
 			}
 			// return error page if present
-			callback(xmlhttp.responseText);
+			callback(xmlhttp.responseText, xmlhttp.status);
 			return false; // Failure, return false
 			};
 			}else{ // old browsers that don't support XHR2
