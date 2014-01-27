@@ -56,7 +56,7 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
 </code></pre>
                     </p>
                     <p><h4><button class="pure-button pure-button-note">Note</button> Serve minified and gzipped for maximum performance</h4></p>
-                    <p><h4><button class="pure-button pure-button-primary">CDN</button> Coming Soon: Use a CDN</h4></p>
+                    {% include cdn.html %}
                 </div>
                 <div class="l-box">
                     <a href="#quick_config_content"><h4 class="content-subhead hash_anchor" id="quick_config_content">Configure content</h4></a>
@@ -223,7 +223,7 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
 <pre><code>&lt;script src=&quot;/shushjax.min.js&quot;&gt;&lt;/script&gt;</code></pre>
                     </p>
                     <p><h4><button class="pure-button pure-button-note">Note</button> Serve minified and gzipped for maximum performance</h4></p>
-                    <p><h4><button class="pure-button pure-button-primary">CDN</button> Coming Soon: Use a CDN</h4></p>
+                    {% include cdn.html %}
                     <h4>Tell shushjax what content to load</h4>
                     <p>
                         shushjax will only replace content that you configure. You'll need a 'container' <code>&lt;div&gt;</code> on each page, which is where shushjax will insert content from new pages. Immediately below the link to the shushjax javascript file, initialize shushjax and specify options. 
