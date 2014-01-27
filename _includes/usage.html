@@ -271,9 +271,16 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                 <div class="l-box">
                     <a href="#full_partial"><h4 class="content-subhead hash_anchor" id="full_partial">Use Partial Files</h4></a>
 
-                    <h3>Tell shushjax what content to load</h3>
+                    <h3>Optional: Use partial file support</h3>
                     <p>
-shushjax will only replace content that you configure. 
+                        You don't need to make any changes to your backend to benefit from shushjax. If you are unable to change the backend code, or simply do not want to, so long as smartLoad is enabled (which it is by default), shushjax will extract the container_divs content from the returned HTML and apply it to the current page meaning shushjax loading will still work as expected (although some of the performance gains may be lost). For even faster performance, deliver partial pages to shushjax. Partial pages contain only the contents of the container div, saving bandwidth. <br>When partial page support is enabled, shushjax looks for partial pages under the <code>/partials</code> directory. For example, if the original page is located at
+                        <pre><code>http://example.com/oceans/pacific.html</code></pre>
+                        shushjax will look for the partial version at
+                        <pre><code>http://example.com/partials/oceans/pacific.html</code></pre>
+                        Once you've set up the files on your server, enable partial pages in your <code>shushjax.connect</code>
+                        <pre><code>&lt;script&gt;shushjax.connect({'container': 'content', 'partial': true,});&lt;/script&gt;</code></pre>
+                        <h4><button class="pure-button pure-button-note">Note</button> Keep your original files</h4>
+                        The original files will still be used the first time that a browser loads a page on your site and are also used by any clients, such as search engines, that are incompatable with shushjax. 
                     </p>
                 </div>
                 <div class="l-box">
@@ -300,9 +307,10 @@ The callbacks are specified as part of the original shushjax.connect method:
                 <div class="l-box">
                     <a href="#full_programmatic"><h4 class="content-subhead hash_anchor" id="full_programmatic">Programmatic Usage</h4></a>
 
-                    <h3>Tell shushjax what content to load</h3>
+                    <h3>Invoke shushjax yourself</h3>
                     <p>
-shushjax will only replace content that you configure. 
+                        You can invoke a shushjax page load programmitcally by calling the shushjax.invoke() method. At minimum the invoke method must be given a url and container attribute. It can also be provided with a title, parseLinksOnload setting and any callbacks you wish to use. 
+                        <pre><code>shushjax.invoke({url:'page1.php', container: 'content',});</code></pre>
                     </p>
                 </div>
             </div>
