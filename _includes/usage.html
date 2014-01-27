@@ -216,9 +216,35 @@ Using shushjax can be as simple as adding a javascript file to your site. For ev
                 <div class="l-box">
                     <a href="#full_setup"><h4 class="content-subhead hash_anchor" id="full_setup">Setup</h4></a>
 
-                    <h3>Tell shushjax what content to load</h3>
+                    <h3>Installation options</h3>
+                    <h4>Insert a link to shushjax in your <code>&lt;head&gt;</code></h4>
                     <p>
-shushjax will only replace content that you configure. 
+                        No matter how you use shushjax, you'll need to place the script on your webserver, then add a link in the <code>&lt;head&gt;</code> of your html:
+<pre><code>
+&lt;script src=&quot;/shushjax.min.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+                    </p>
+                    <p><h4><button class="pure-button pure-button-note">Note</button> Serve minified and gzipped for maximum performance</h4></p>
+                    <p><h4><button class="pure-button pure-button-primary">CDN</button> Coming Soon: Use a CDN</h4></p>
+                    <h4>Tell shushjax what content to load</h4>
+                    <p>
+                        shushjax will only replace content that you configure. You'll need a 'container' <code>&lt;div&gt;</code> on each page, which is where shushjax will insert content from new pages. Immediately below the link to the shushjax javascript file, initialize shushjax and specify options. 
+<pre><code>
+&lt;script&gt;shushjax.connect();&lt;/script&gt;
+</code></pre>
+                        When enabling shushjax, you can choose to activate on all normal links or just links with a special class. You can also specify either one container for all loaded content or use special settings on individual links. 
+                    </p>
+                    <h4>The container</h4>
+                    <p>
+                        This is where freshly loaded content gets inserted. <br> Use the global <code>container</code> setting in your <code>shushjax.connect</code>:
+                        <pre><code>&lt;script&gt;shushjax.connect({container: 'content',});&lt;/script&gt;</code></pre>
+                        And/ or set each link individually with the <code>data-shushjax</code> attribute:
+                        <pre><code>&lt;a href='unicorns.html' data-shushjax='content'&gt;Unicorns!&lt;/a&gt;</code></pre>
+                    </p>
+                    <h4>Using classes</h4>
+                    <p>
+                            You can choose to only activate links with a specifc class with the <code>useClass</code> setting:
+                            <pre><code>&lt;script&gt;shushjax.connect({container: 'content', useClass: 'shushjax-enabled',});&lt;/script&gt;</code></pre>
                     </p>
                 </div>
                 <div class="l-box">
@@ -229,6 +255,7 @@ shushjax will only replace content that you configure.
                     shushjax has several options that you can specify during the initialization call, like this
                     <pre><code>&lt;script&gt;shushjax.connect({options});&lt;/script&gt;</code></pre>
                     <ul>
+                        <li><strong>container</strong> <em>string</em> The <code>&lt;div&gt;</code> where freshly loaded content gets inserted</li>
                         <li><strong>smartLoad</strong> <em>true|false</em> Ensure that the returned HTML is usable. Enabled by default. You can disable this for a slight performance boost if you are absolutely sure that the returned HTML is a properly formatted partial file. It's suggested that you keep this enabled so that shushjax can automatically work around problems with the returned page. 
                             <pre><code>'smartLoad': true,</code></pre>
                         </li>
