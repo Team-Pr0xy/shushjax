@@ -8,9 +8,11 @@
  */
 // BatchDom, based on FastDom by Wilson Page <wilsonpage@me.com> https://github.com/wilsonpage/fastdom
 // Eliminates layout thrashing by batching DOM read/write interactions.
-/* jshint bitwise:false */
+/*jshint bitwise:false*/
+/*jslint vars: true, regexp: true, white: true, browser: true*/
+/*global console: false, batchdom, require, module, define, webkitURL, _gaq, ActiveXObject*/
 ;(function(batchdom){
-  'use strict';
+    'use strict';
   // Normalize rAF
   var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || function(cb) { return window.setTimeout(cb, 1000 / 60); };
   // Normalize cAF
@@ -51,7 +53,9 @@
     // 2. A frame is already scheduled
     var doesntNeedFrame = this.batch.mode === 'reading' || this.batch.scheduled;
     // If a frame isn't needed, return
-    if (doesntNeedFrame) return id;
+    if (doesntNeedFrame){
+    return id;
+    }
     // Schedule a new frame, then return
     this.scheduleBatch();
     return id;
@@ -73,7 +77,9 @@
     // 3. A frame is already scheduled.
     var doesntNeedFrame = mode === 'writing' || mode === 'reading' || this.batch.scheduled;
     // If a frame isn't needed, return
-    if (doesntNeedFrame) return id;
+    if (doesntNeedFrame){
+    return id;
+    }
     // Schedule a new frame, then return
     this.scheduleBatch();
     return id;
@@ -145,12 +151,16 @@
       return this.clearFrame(id);
     }
     var job = this.batch.hash[id];
-    if (!job) return;
+    if (!job){
+    return;
+    }
     var list = this.batch[job.type];
     var index = list.indexOf(id);
     // Clear references
     delete this.batch.hash[id];
-    if (~index) list.splice(index, 1);
+    if (~index){
+    list.splice(index, 1);
+    }
   };
   /**
    * Clears a scheduled frame.
@@ -159,7 +169,9 @@
    */
   BatchDom.prototype.clearFrame = function(frame) {
     var index = this.frames.indexOf(frame);
-    if (~index) this.frames.splice(index, 1);
+    if (~index){
+    this.frames.splice(index, 1);
+    }
   };
   /**
    * Schedules a new read/write batch if one isn't pending.
@@ -270,7 +282,9 @@
     var self = this;
     var raf = this.raf;
     // Don't start more than one loop
-    if (this.looping) return;
+    if (this.looping){
+    return;
+    }
     raf(function frame() {
       var fn = self.frames.shift();
       // If no more frames, stop looping
@@ -282,7 +296,8 @@
       }
       // Run the frame.  Note that this may throw an error in user code, but all batchdom tasks are dealt
       // with already so the code will continue to iterate
-      if (fn) fn();
+      if (fn){
+      fn();}
     });
     this.looping = true;
   };
@@ -356,9 +371,10 @@
 	 * @return obj
 	 */
 	internal.clone = function(obj){
-		object = {};
+		var object = {};
 		//For every option in object, create it in the duplicate.
-		for (var i in obj) {
+		var i;
+		for (i in obj) {
                         if (obj.hasOwnProperty(i)){
 			object[i] = obj[i];
 			}
@@ -373,6 +389,7 @@
 	 * @return event_name. type of event
 	 */
 	internal.triggerEvent = function(node, event_name){
+                var evt;
 		if (document.createEvent) {
 		// Good browsers
 		evt = document.createEvent("HTMLEvents");
@@ -400,8 +417,11 @@
 			};
                         // Merge original in original connect options
                         if(typeof internal.options !== 'undefined'){
-                                for(var a in internal.options){ 
-                                        if(typeof opt[a] === 'undefined') opt[a] = internal.options[a];
+                                var a;
+                                for(a in internal.options){ 
+                                        if(typeof opt[a] === 'undefined'){
+                                        opt[a] = internal.options[a];
+                                        }
                                 }         
                         }
 
@@ -464,15 +484,22 @@
 		// Attach event.
 		internal.addEvent(node, 'click', function(event){
 			// Allow middle click (pages in new windows)
-			if ( event.which > 1 || event.metaKey ) return;
+			if ( event.which > 1 || event.metaKey ){
+			return;
+			}
 			// Dont fire normal event
-			if(event.preventDefault){event.preventDefault();}else{event.returnValue = false;}
+			if(event.preventDefault){
+			event.preventDefault();
+			}else{
+			event.returnValue = false;
+			}
 			// Take no action if we are already on said page?
 			if(document.location.href === options.url){
 			batchdom.writelog("Ignoring same-page anchor " + options.url);
 			return false;
 			}
 			// handle the load.
+			batchdom.writelog("Event " + event + " triggered");
 			internal.handle(options);
 		});
 	};
@@ -484,6 +511,7 @@
 	 * @param options. Valid Options object.
 	 */
 	internal.parseLinks = function(dom_obj, options){
+                var nodes;
 		if(typeof options.useClass !== "undefined"){
 			// Get all nodes with the provided classname.
 			nodes = dom_obj.getElementsByClassName(options.useClass);
@@ -493,7 +521,10 @@
 			batchdom.writelog("Attaching to all links, useClass is unspecified");
 		}
 		// For all returned nodes
-		for(var i=0,tmp_opt; i < nodes.length; i++){
+		var node;
+		var i;
+		var tmp_opt;
+		for(i=0,tmp_opt; i < nodes.length; i++){
 			node = nodes[i];
 			// Override options history to true, else link parsing could be triggered by backbutton (which runs in no-history mode)
 			tmp_opt = internal.clone(options);
@@ -523,8 +554,9 @@
 		document.title = title;
 		}
 		//Look through all returned divs.
-		tmpNodes = tmp.getElementsByTagName('div');
-		for(var i=0;i<tmpNodes.length;i++){
+		var tmpNodes = tmp.getElementsByTagName('div');
+		var i;
+		for(i=0;i<tmpNodes.length;i++){
 			if(tmpNodes[i].id === options.container.id){
 				// If our container div is within the returned HTML, we both know the returned content is
 				// not partial pages ready, but instead likely the full HTML content. In addition we can also guess that
@@ -533,7 +565,9 @@
 				batchdom.writeinfo("Found container div in the returned HTML, treating as full HTML content and processing with smartLoad");
 				// break;
 				return tmpNodes[i].innerHTML;
-			}else batchdom.writelog("Didn't find container div in the returned HTML, processing as a partial page");
+			}else{
+			batchdom.writelog("Didn't find container div in the returned HTML, processing as a partial page");
+			}
 		}
 		// If our container was not found, HTML will be returned as is.
 		return html;
@@ -549,16 +583,21 @@
 	internal.handle = function(options){
 		// Fire beforeSend Event.
 		internal.triggerEvent(options.container, 'beforeSend');
+		batchdom.writelog("Firing request handler");
 		// Do the request
-		internal.request(options.url, options.partial, function(html){
+		internal.request(options.url, options.partial, function(html, httpstatus){
+                        batchdom.writelog("Request handler returned");
                         if (! html ){
 				internal.triggerEvent(options.container,'requestError');
 				return;
 			}
 			// Ensure we have the correct HTML to apply to our container.
 			batchdom.writelog("smartLoad is " + options.smartLoad);
-			if(options.smartLoad) html = internal.smartLoad(html, options);
+			if(options.smartLoad){
+			html = internal.smartLoad(html, options);
+			}
 			// Update the dom with the new content
+			batchdom.writelog("Inserting new content");
 			options.container.innerHTML = html;
 			// Initalise any links found within document (if enabled).
 			batchdom.writelog("parseLinksOnLoad is " + options.parseLinksOnload);
@@ -571,6 +610,7 @@
 				if(options.container.getElementsByTagName('title').length !== 0){
 					options.title = options.container.getElementsByTagName('title')[0].innerHTML;
 				}else{
+					batchdom.writelog("New title was not supplied, using existing");
 					options.title = document.title;
 				}
 			}
@@ -578,23 +618,26 @@
 			if(options.history){
 				// If this is the first time shushjax has run, create a state object for the current page.
 				if(internal.firstrun){
+                                        batchdom.writelog("Creating a new state object for the current page");
 					window.history.replaceState({'url': document.location.href, 'container':  options.container.id}, document.title);
 					internal.firstrun = false;
 				}
 				// Update browser history
+				batchdom.writelog("Updating browser history");
 				window.history.pushState({'url': options.url, 'container': options.container.id }, options.title , options.url);
 			}
 			// Fire Events
 			internal.triggerEvent(options.container,'complete');
-			if (xmlhttp.status !== 200){ // Got a page with an error
+			if (httpstatus !== 200){ // Got a page with an error
                                 internal.triggerEvent(options.container,'requestError');
-                                batchdom.writeerror("Request finished with HTTP error " + xmlhttp.status);
+                                batchdom.writeerror("Request finished with HTTP error " + httpstatus);
                                 return;
 			}
 			if(html === false || html === "undefined"){ // Somthing went wrong
 				internal.triggerEvent(options.container,'requestError');
 				return;
 			}else{ //got what we expected.
+                                batchdom.writelog("Finishing handling load request");
 				internal.triggerEvent(options.container,'success');
 			}
 			// If Google analytics is detected push a trackPageView, so shushjax pages can be tracked successfully.
@@ -603,6 +646,7 @@
 			_gaq.push(['_trackPageview']);
 			}
 			// Set new title
+			batchdom.writelog("Setting new page title to " + options.title);
 			document.title = options.title;
 		});
 	};
@@ -617,25 +661,22 @@
 	internal.request = function(location, partial, callback){
 		batchdom.writelog("Requesting page " + location);
 		// Create xmlHttpRequest object.
-		xmlhttp = window.XMLHttpRequest?new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
+		var xmlhttp = window.XMLHttpRequest?new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
 			// Check if the browser supports XHR2
 			if (typeof xmlhttp.onload !== "undefined"){
 			batchdom.writelog("Using XHR2");
-			xmlhttp.onloadend = function(){ // Finished load
-			batchdom.writelog("Fetch complete, HTTP status code " + xmlhttp.status);
-			if (xmlhttp.status !== 200){
-			}
-			callback(xmlhttp.responseText, xmlhttp.status); // Success, Return HTML
+			xmlhttp.onload = function(){ // Finished load
+			batchdom.writelog("XHR2 Fetch complete, HTTP status code " + xmlhttp.status);
+			callback(xmlhttp.response, xmlhttp.status); // Success, Return HTML
 			};
 			xmlhttp.onerror = function(){ // Error during loading
 			if (xmlhttp.status === 0){
-			batchdom.writeerror("Failed to connect to the server, network error " + xmlhttp.status);
+			batchdom.writeerror("XHR2 Failed to connect to the server, network error " + xmlhttp.status);
 			}else{
-			batchdom.writeerror("Fetch error, HTTP status code " + xmlhttp.status);
+			batchdom.writeerror("XHR2 Fetch error, HTTP status code " + xmlhttp.status);
 			}
 			// return error page if present
 			callback(xmlhttp.responseText, xmlhttp.status);
-			return false; // Failure, return false
 			};
 			}else{ // old browsers that don't support XHR2
 			batchdom.writeinfo("Falling back to basic XHR");
@@ -643,23 +684,24 @@
 			xmlhttp.onreadystatechange = function(){
 				if ((xmlhttp.readyState === 4) && (xmlhttp.status === 200)) {
 					// Success, Return html
-					callback(xmlhttp.responseText);
-					batchdom.writelog("Fetch complete");
+					callback(xmlhttp.responseText, xmlhttp.status);
+					batchdom.writelog("XHR Fetch complete");
 				}else if((xmlhttp.readyState === 4) && (xmlhttp.status !== 200)){
 					// error, return error page if present
-					batchdom.writeerror("Fetch error, HTTP status code " + xmlhttp.status);
-					callback(xmlhttp.responseText);
-					return false;} // Failure, return false
+					batchdom.writeerror("XHR Fetch error, HTTP status code " + xmlhttp.status);
+					callback(xmlhttp.responseText, xmlhttp.status);
+					}
 				};
 			}
 			// re-format the URL so we can modify it
 			// Check for browser support of URL()
-			if (typeof(URL) === "function"){
+			var formaturl;
+			if (typeof URL === "function"){
 			formaturl = new URL(location);
 			batchdom.writelog("Using URL() to process location");
 			// Some browsers implement URL() as webkitURL()
 			}else{
-			if (typeof(webkitURL) === "function"){
+			if (typeof webkitURL === "function"){
 			formaturl = new webkitURL(location);
 			batchdom.writeinfo("Using webkitURL() instead of URL()");
 			// if the client doesn't support URL() or webkitURL(), disable partial file support
@@ -668,6 +710,7 @@
 			batchdom.writeinfo("Disabling partial file support, browser does not support URL()");
 			}}
 			// Use partial file support if it's enabled
+			var getlocation;
 			if(partial === true){
 			getlocation = formaturl.protocol + "//" + formaturl.host + "/partials" + formaturl.pathname;
 			batchdom.writelog("Fetching a partial HTML file");
@@ -676,12 +719,13 @@
 			batchdom.writelog("Fetching a full HTML file");
 			}
 			// Actually send the request
-			batchdom.writelog("Fetching " + getlocation);
+			batchdom.writelog("Opening " + getlocation);
 			xmlhttp.open("GET", getlocation, true);
 			// Add headers so things can tell the request is being performed via AJAX.
 			xmlhttp.setRequestHeader('X-shushjax', 'true'); // shushjax header, kept so you can see usage in server logs
 			xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Standard AJAX header.
-			xmlhttp.send(null);
+			batchdom.writelog("Fetching " + getlocation);
+			xmlhttp.send();
 	};
 	/**
 	 * parseOptions
@@ -692,7 +736,7 @@
 	 */
 	internal.parseOptions = function(options){
 		// Defaults. (if somthing isn't provided)
-		opt = {};
+		var opt = {};
 		opt.history = true;
 		opt.parseLinksOnload = true;
 		opt.smartLoad = true;
@@ -727,6 +771,7 @@
 			options.smartLoad = opt.smartLoad;
 		}
 		// Get container (if its an id, convert it to a dom node.)
+		var container;
 		if(typeof options.container === 'string' ) {
 			container = document.getElementById(options.container);
 			if(container === null){
@@ -816,6 +861,7 @@
 	 */
 	this.invoke = function(/* options */){
 		// url, container
+		var options;
 		if(arguments.length === 2){
 			options = {};
 			options.url = arguments[0];
@@ -832,7 +878,9 @@
 		// Proccess options
 		options = internal.parseOptions(options);
 		// If everything went ok, activate shushjax.
-		if(options !== false) internal.handle(options);
+		if(options !== false){
+		internal.handle(options);
+		}
 		batchdom.writelog("Everything is okay, activating shushjax");
 	};
 	var shushjax_obj = this;
