@@ -10,7 +10,7 @@
 // Eliminates layout thrashing by batching DOM read/write interactions.
 /*jshint bitwise:false*/
 /*jslint vars: true, regexp: true, white: true, browser: true*/
-/*global console: false, batchdom, require, module, define, webkitURL, _gaq, ActiveXObject*/
+/*global console: false, batchdom, module, define, _gaq, ActiveXObject*/
 ;(function(batchdom){
     'use strict';
   // Normalize rAF
@@ -90,7 +90,6 @@
    * @api public
    */
   BatchDom.prototype.writelog = function(logtext){
-    var self = this;
     return this.write(function(){
     (console.log(logtext));
     });
@@ -101,7 +100,6 @@
    * @api public
    */
   BatchDom.prototype.writeinfo = function(logtext){
-    var self = this;
     return this.write(function(){
     (console.info(logtext));
     });
@@ -112,7 +110,6 @@
    * @api public
    */
   BatchDom.prototype.writeerror = function(logtext){
-    var self = this;
     return this.write(function(){
     (console.error(logtext));
     });
@@ -352,9 +349,7 @@
 		if(window.addEventListener){
 				// Browsers that don't suck
 				batchdom.writelog("Adding event listener to " + obj + " on event " + event);
-				batchdom.write(function() {
-				obj.addEventListener(event, callback, false);
-				});
+                                obj.addEventListener(event, callback, false);
 		}else{
 				// IE8/7
 				batchdom.writeinfo("Adding fallback event listeners for old IE versions");
@@ -511,6 +506,7 @@
 	 * @param options. Valid Options object.
 	 */
 	internal.parseLinks = function(dom_obj, options){
+                batchdom.writelog("Starting to parse links");
                 var nodes;
 		if(typeof options.useClass !== "undefined"){
 			// Get all nodes with the provided classname.
@@ -694,21 +690,20 @@
 				};
 			}
 			// re-format the URL so we can modify it
-			// Check for browser support of URL()
+			// Check for browser support of window.URL()
 			var formaturl;
-			if (typeof URL === "function"){
-			formaturl = new URL(location);
-			batchdom.writelog("Using URL() to process location");
-			// Some browsers implement URL() as webkitURL()
-			}else{
-			if (typeof webkitURL === "function"){
-			formaturl = new webkitURL(location);
-			batchdom.writeinfo("Using webkitURL() instead of URL()");
-			// if the client doesn't support URL() or webkitURL(), disable partial file support
+			if (typeof(window.URL) === "function"){
+			formaturl = new window.URL(location);
+			batchdom.writelog("Using window.URL() to process location");
+			// Some browsers implement window.URL() as window.webkitURL()
+			}else if (typeof(window.webkitURL) === "function"){
+			formaturl = new window.webkitURL(location);
+			batchdom.writeinfo("Using window.webkitURL() instead of window.URL()");
+			// if the client doesn't support window.URL() or window.webkitURL(), disable partial file support
 			}else{
 			partial = false;
-			batchdom.writeinfo("Disabling partial file support, browser does not support URL()");
-			}}
+			batchdom.writeinfo("Disabling partial file support, browser does not support window.URL()");
+			}
 			// Use partial file support if it's enabled
 			var getlocation;
 			if(partial === true){
@@ -843,9 +838,11 @@
 		delete options.history;
 		internal.options = options;
 		if(document.readyState === 'complete') {
+			batchdom.writelog("Document is ready, starting parselinks");
 			internal.parseLinks(document, options);
 		} else {
 			// Dont run until the window is ready.
+			batchdom.writelog("Document isn't ready, yet, waiting to start parselinks");
 			internal.addEvent(window, 'load', function(){	
 				// Parse links using specified options
 				internal.parseLinks(document, options);
