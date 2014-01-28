@@ -411,10 +411,10 @@
 				'history': false
 			};
                         // Merge original in original connect options
-                        if(typeof internal.options !== 'undefined'){
+                        if(typeof(internal.options) !== 'undefined'){
                                 var a;
                                 for(a in internal.options){ 
-                                        if(typeof opt[a] === 'undefined'){
+                                        if(typeof(opt[a]) === 'undefined'){
                                         opt[a] = internal.options[a];
                                         }
                                 }         
@@ -508,7 +508,7 @@
 	internal.parseLinks = function(dom_obj, options){
                 batchdom.writelog("Starting to parse links");
                 var nodes;
-		if(typeof options.useClass !== "undefined"){
+		if(typeof(options.useClass) !== "undefined"){
 			// Get all nodes with the provided classname.
 			nodes = dom_obj.getElementsByClassName(options.useClass);
 			batchdom.writelog("Attaching to links with class " + options.useClass);
@@ -561,11 +561,10 @@
 				batchdom.writeinfo("Found container div in the returned HTML, treating as full HTML content and processing with smartLoad");
 				// break;
 				return tmpNodes[i].innerHTML;
-			}else{
-			batchdom.writelog("Didn't find container div in the returned HTML, processing as a partial page");
 			}
 		}
 		// If our container was not found, HTML will be returned as is.
+		batchdom.writelog("Didn't find container div in the returned HTML, processing as a partial page");
 		return html;
 	};
 	/**
@@ -601,7 +600,7 @@
 				internal.parseLinks(options.container, options);
 			}
 			// If no title was provided
-			if(typeof options.title === "undefined"){
+			if(typeof(options.title) === "undefined"){
 				// Attempt to grab title from page contents.
 				if(options.container.getElementsByTagName('title').length !== 0){
 					options.title = options.container.getElementsByTagName('title')[0].innerHTML;
@@ -737,13 +736,13 @@
 		opt.smartLoad = true;
 		opt.partial = false;
 		// Ensure a url and container have been provided.
-		if(typeof options.url === "undefined" || typeof options.container === "undefined"){
+		if(! options.hasOwnProperty("url") || ! options.hasOwnProperty("container")){
 			batchdom.writeerror("URL and Container must be provided");
 			internal.triggerEvent(options.container,'generalError');
 			return false;
 		}
 		// Find out if history has been provided
-		if(typeof options.history === 'undefined'){
+		if(! options.hasOwnProperty("history")){
 			// use default
 			options.history = opt.history;
 		}else{
@@ -752,17 +751,18 @@
 		}
 		// Parse Links on load? Enabled by default.
 		// (Proccess pages loaded via shushjax and setup shushjax on any links found.)
-		if(typeof options.parseLinksOnload === "undefined"){
+		if(! options.hasOwnProperty("parseLinksOnload")){
 			options.parseLinksOnload = opt.parseLinksOnload;
 		}
 		// Use partial file support? Disabled by default
-		if(typeof options.partial === "undefined"){
+		if(! options.hasOwnProperty("partial")){
 			options.partial = opt.partial;
 		}
 		// Smart load (enabled by default). Tries to ensure the correct HTML is loaded.
 		// If you are certain your backend will only return shushjax ready content this can be disabled
 		// for a slight perfomance boost.
-		if(typeof options.smartLoad === "undefined"){
+		if(! options.hasOwnProperty("smartLoad")){
+		// if(typeof(options.smartLoad) === "undefined"){
 			options.smartLoad = opt.smartLoad;
 		}
 		// Get container (if its an id, convert it to a dom node.)
@@ -881,13 +881,11 @@
 		batchdom.writelog("Everything is okay, activating shushjax");
 	};
 	var shushjax_obj = this;
-        if (typeof define === 'function' && define.amd) {
-                // register shushjax as AMD module
-                define( function() {
+        if (typeof define === 'function' && define.amd){ // Register shushjax as an AMD Module
+        define (function() {
             return shushjax_obj;
         });
         }else{
-                // Make shushjax object accessible in global namespace
-                window.shushjax = shushjax_obj;
+        window.shushjax = shushjax_obj; // Make shushjax object accessible in global namespace
         }
 }).call({});
