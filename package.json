@@ -1,0 +1,38 @@
+{
+  "name": "shushjax",
+  "title": "shushjax",
+  "description": "Standalone (no jQuery) Headerless Pushstate + AJAX",
+  "version": "0.1",
+  "homepage": "https://github.com/Team-Pr0xy/shushjax",
+  "author": {
+    "name": "Team Pr0xy",
+    "url": "http://www.teampr0xy.net/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Team-Pr0xy/shushjax.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Team-Pr0xy/shushjax/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/Team-Pr0xy/shushjax/blob/master/LICENSE"
+    },
+  ],
+  "contributors": [ 
+    {
+      "name": "JC Hulce",
+      "email": "jchulce@users.noreply.github.com",
+      "url": "chulce@users.noreply.github.com",
+    } 
+  ],
+  "scripts": {
+    "test": "grunt travis --verbose"
+  },
+  "devDependencies": {
+    "grunt": "~0.3.14"
+  },
+  "keywords": []
+}
