@@ -352,9 +352,7 @@
 		if(window.addEventListener){
 				// Browsers that don't suck
 				batchdom.writelog("Adding event listener to " + obj + " on event " + event);
-				batchdom.write(function() {
 				obj.addEventListener(event, callback, false);
-				});
 		}else{
 				// IE8/7
 				batchdom.writeinfo("Adding fallback event listeners for old IE versions");
