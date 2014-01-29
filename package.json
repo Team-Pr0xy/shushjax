@@ -2,7 +2,7 @@
     "name": "shushjax",
     "title": "shushjax",
     "description": "Standalone (no jQuery) Headerless Pushstate + AJAX",
-    "version": "0.1",
+    "version": "0.1.0",
     "homepage": "https://github.com/Team-Pr0xy/shushjax",
     "author": {
         "name": "Team Pr0xy",
@@ -32,6 +32,7 @@
         "test": "grunt travis --verbose"
     },
     "devDependencies": {
-        "grunt": "~0.3.14"
+        "grunt": "~0.4.2",
+        "grunt-contrib-jshint": "~0.6.3"
     }
 }
