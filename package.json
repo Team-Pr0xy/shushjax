@@ -38,7 +38,6 @@
     "grunt-contrib-clean": "~0.5.0"
   },
   "readmeFilename": "readme.md",
-  "gitHead": "e915f4d1164547f4b593482fbbc2ad3ea6132964",
   "main": "shushjax.js",
   "keywords": [
     "pushState",
