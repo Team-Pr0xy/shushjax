@@ -753,7 +753,7 @@
 			options.history = opt.history;
 		}else{
 			// Ensure its bool.
-			options.history = (!(options.history === false));
+			options.history = true;
 		}
 		// Parse Links on load? Enabled by default.
 		// (Proccess pages loaded via shushjax and setup shushjax on any links found.)
